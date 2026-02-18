@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="C:\Users\micha\Downloads\CANCHO\websitecode\imgs\PAF_Seal.png">
+    <title>PAF News & Updates</title>
+    <style>
+        #profileDropdown.show { display: block !important; }
+        .loader { border: 2px solid #f3f3f3; border-top: 2px solid #3b82f6; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    </style>
+</head>
+<body class="bg-[#F8FAFC] font-sans text-slate-800">
+
+    <nav class="bg-white border-b border-gray-100 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-2">
+             <div class="text-xs font-bold leading-tight">
+                <span class="text-orange-500">PAF</span> <span class="text-blue-900 italic">interactive</span><br>
+                <span class="text-red-600 text-sm tracking-tighter uppercase">Augmented Reality</span>
+             </div>
+        </div>
+
+        <div class="hidden md:flex items-center gap-6 font-semibold text-gray-500 text-sm">
+            <a href="dashboard.html" class="hover:text-blue-600 transition-colors">🏠 Dashboard</a>
+            <a href="time.html" class="hover:text-blue-600 transition-colors">👤 Time-in/Time-out</a>
+            <a href="news.html" class="text-blue-600 bg-blue-50 px-4 py-2 rounded-xl">📰 News/Updates</a>
+            <a href="manage.html" class="hover:text-blue-600 transition-colors">👥 Manage Users</a>
+        </div>
+
+        <div class="relative">
+            <div id="profileBtn" class="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100 cursor-pointer hover:bg-gray-200 transition-all">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=aug" alt="avatar" class="w-7 h-7 rounded-full bg-purple-500">
+                <span id="navAdminName" class="text-sm font-bold">Admin</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+            </div>
+            <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-[60] hidden">
+                <div class="px-4 py-2 border-b border-gray-50 mb-1">
+                    <p class="text-[10px] text-gray-400 uppercase font-bold">Admin Account</p>
+                    <p id="navAdminEmail" class="text-xs font-semibold truncate text-blue-900">admin@paf.com</p>
+                </div>
+                <button id="logoutBtn" class="w-full text-left px-4 py-2 text-sm text-red-600 font-bold hover:bg-red-50 transition-colors">Sign out</button>
+            </div>
+        </div>
+    </nav>
+
+    <header class="max-w-6xl mx-auto px-8 pt-10 flex items-center gap-3">
+        <div class="bg-blue-100 p-2 rounded-lg text-blue-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2zM14 4v4h4" /></svg>
+        </div>
+        <div>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight">News & Updates</h1>
+            <p class="text-gray-500 text-sm font-medium">Manage and publish your latest announcements</p>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-8">
+        
+        <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-8 mb-12">
+            <div class="flex justify-between items-center mb-4">
+                <h2 id="formStatus" class="text-sm font-bold text-blue-600 uppercase tracking-widest">Create New Post</h2>
+                <button id="cancelEdit" class="hidden text-xs font-bold text-red-500 hover:underline">Cancel Edit</button>
+            </div>
+            <form id="newsForm" class="grid grid-cols-1 md:grid-cols-12 gap-8">
+                
+                <div class="md:col-span-4">
+                    <input type="file" id="file-upload" accept="image/*" class="hidden" />
+                    <label for="file-upload" class="cursor-pointer border-2 border-dashed border-gray-200 rounded-2xl aspect-video md:aspect-square flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 hover:border-blue-300 transition-all overflow-hidden group">
+                        <img id="imagePreview" class="hidden w-full h-full object-cover">
+                        <div id="placeholderGroup" class="text-center space-y-2">
+                            <div class="bg-white p-3 rounded-xl shadow-sm inline-block text-gray-400 group-hover:text-blue-500 transition-colors">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            </div>
+                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest">Click to upload</p>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="md:col-span-8 space-y-6">
+                    <div>
+                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Title</label>
+                        <input type="text" id="newsTitle" required placeholder="Enter news title..." 
+                            class="w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-semibold">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Description</label>
+                        <textarea id="newsDesc" rows="5" required placeholder="Enter description..." 
+                            class="w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-sm leading-relaxed resize-none font-medium"></textarea>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl transition-all shadow-xl shadow-blue-100 flex items-center justify-center gap-3">
+                        <span id="btnText">Publish</span>
+                        <div id="btnLoader" class="loader hidden"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div id="newsFeed" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="col-span-full py-20 text-center text-slate-400 font-bold italic">Loading announcements...</div>
+        </div>
+
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, updateDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyArXdGOgHeeoX2iqegUvpg5l-eF02SUE-Y",
+            authDomain: "paf06-7d7cb.firebaseapp.com",
+            projectId: "paf06-7d7cb",
+            storageBucket: "paf06-7d7cb.firebasestorage.app",
+            messagingSenderId: "661740924808",
+            appId: "1:661740924808:web:6b00c1341f34e9eb81143d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const cloudName = "duzlklts9";
+
+        let currentEditId = null;
+        let existingImageUrl = "";
+
+        // --- SESSION & NAVIGATION ---
+        onAuthStateChanged(auth, (user) => {
+            if (!user) window.location.href = "index.html";
+            else {
+                document.getElementById('navAdminName').innerText = user.email.split('@')[0];
+                document.getElementById('navAdminEmail').innerText = user.email;
+            }
+        });
+
+        const profileBtn = document.getElementById('profileBtn');
+        const profileDropdown = document.getElementById('profileDropdown');
+        profileBtn.onclick = (e) => { e.stopPropagation(); profileDropdown.classList.toggle('hidden'); };
+        window.onclick = () => profileDropdown.classList.add('hidden');
+        document.getElementById('logoutBtn').onclick = () => signOut(auth);
+
+        // --- IMAGE PREVIEW ---
+        const fileInput = document.getElementById('file-upload');
+        const imgPreview = document.getElementById('imagePreview');
+        const placeholderGroup = document.getElementById('placeholderGroup');
+
+        fileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    imgPreview.src = event.target.result;
+                    imgPreview.classList.remove('hidden');
+                    placeholderGroup.classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        // --- LOAD NEWS FEED ---
+        onSnapshot(query(collection(db, "news"), orderBy("timestamp", "desc")), (snapshot) => {
+            const newsFeed = document.getElementById('newsFeed');
+            if (snapshot.empty) {
+                newsFeed.innerHTML = `<div class="col-span-full py-20 text-center text-slate-400 font-bold italic">No announcements published yet.</div>`;
+                return;
+            }
+
+            newsFeed.innerHTML = snapshot.docs.map(docData => {
+                const data = docData.data();
+                const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Processing...';
+                
+                return `
+                    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col group">
+                        <div class="aspect-video w-full overflow-hidden bg-gray-100 relative">
+                            <img src="${data.imageUrl}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute top-3 right-3 flex gap-2">
+                                <button onclick="startEdit('${docData.id}', \`${data.title}\`, \`${data.description}\`, '${data.imageUrl}')" class="bg-white/90 backdrop-blur p-2 rounded-xl text-blue-500 shadow-sm hover:bg-blue-600 hover:text-white transition-all">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                </button>
+                                <button onclick="deleteNews('${docData.id}')" class="bg-white/90 backdrop-blur p-2 rounded-xl text-red-500 shadow-sm hover:bg-red-600 hover:text-white transition-all">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6 flex flex-col flex-1">
+                            <div class="flex items-center gap-2 mb-3">
+                                <h3 class="font-black text-slate-900 uppercase tracking-tight truncate flex-1">${data.title}</h3>
+                                <span class="text-lg">📢</span>
+                            </div>
+                            <p class="text-xs font-medium text-slate-500 line-clamp-3 leading-relaxed flex-1">${data.description}</p>
+                            <div class="mt-5 pt-4 border-t border-gray-50 flex justify-between items-center">
+                                <span class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Interactive Feed</span>
+                                <span class="text-[10px] font-bold text-gray-400 italic">${date}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        });
+
+        // --- EDIT LOGIC ---
+        window.startEdit = (id, title, desc, imageUrl) => {
+            currentEditId = id;
+            existingImageUrl = imageUrl;
+            
+            document.getElementById('newsTitle').value = title;
+            document.getElementById('newsDesc').value = desc;
+            
+            imgPreview.src = imageUrl;
+            imgPreview.classList.remove('hidden');
+            placeholderGroup.classList.add('hidden');
+            
+            document.getElementById('formStatus').innerText = "Editing Post";
+            document.getElementById('btnText').innerText = "Update News";
+            document.getElementById('cancelEdit').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        document.getElementById('cancelEdit').onclick = () => {
+            resetForm();
+        };
+
+        function resetForm() {
+            currentEditId = null;
+            existingImageUrl = "";
+            document.getElementById('newsForm').reset();
+            imgPreview.classList.add('hidden');
+            placeholderGroup.classList.remove('hidden');
+            document.getElementById('formStatus').innerText = "Create New Post";
+            document.getElementById('btnText').innerText = "Publish";
+            document.getElementById('cancelEdit').classList.add('hidden');
+        }
+
+        // --- SUBMIT (PUBLISH OR UPDATE) ---
+        document.getElementById('newsForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const loader = document.getElementById('btnLoader');
+            const btnText = document.getElementById('btnText');
+            const title = document.getElementById('newsTitle').value;
+            const desc = document.getElementById('newsDesc').value;
+
+            btn.disabled = true;
+            loader.classList.remove('hidden');
+            btnText.innerText = currentEditId ? "Updating..." : "Publishing...";
+
+            try {
+                let finalImageUrl = existingImageUrl;
+
+                // Check if may bagong file na inupload
+                if (fileInput.files[0]) {
+                    const formData = new FormData();
+                    formData.append('file', fileInput.files[0]);
+                    formData.append('upload_preset', 'ml_default');
+
+                    const cloudRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const cloudData = await cloudRes.json();
+                    finalImageUrl = cloudData.secure_url;
+                }
+
+                if (currentEditId) {
+                    // Update Mode
+                    await updateDoc(doc(db, "news", currentEditId), {
+                        title: title,
+                        description: desc,
+                        imageUrl: finalImageUrl,
+                        lastUpdated: serverTimestamp()
+                    });
+                    alert("News Updated Successfully!");
+                } else {
+                    // Create Mode
+                    if (!finalImageUrl) throw new Error("Please upload an image.");
+                    await addDoc(collection(db, "news"), {
+                        title: title,
+                        description: desc,
+                        imageUrl: finalImageUrl,
+                        timestamp: serverTimestamp()
+                    });
+                    alert("News Published Successfully!");
+                }
+
+                resetForm();
+
+            } catch (err) {
+                console.error(err);
+                alert(err.message || "Operation failed.");
+            } finally {
+                btn.disabled = false;
+                loader.classList.add('hidden');
+                btnText.innerText = currentEditId ? "Update News" : "Publish";
+            }
+        };
+
+        // --- DELETE NEWS ---
+        window.deleteNews = async (id) => {
+            if (confirm("Are you sure you want to delete this announcement?")) {
+                try {
+                    await deleteDoc(doc(db, "news", id));
+                } catch (err) {
+                    alert("Error deleting news.");
+                }
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+    <link rel="icon" type="image/png" href="C:\Users\micha\Downloads\CANCHO\websitecode\imgs\PAF_Seal.png">
+    <title>PAF Time-in/Time-out</title>
+    <style>
+        #profileDropdown { display: none; }
+        #profileDropdown.show { display: block; }
+        .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
+        .modal { display: none; }
+        .modal.flex { display: flex; }
+
+        /* Scanning Animation */
+        .scanner-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to bottom, transparent, #3b82f6, transparent);
+            box-shadow: 0 0 15px #3b82f6;
+            animation: scan 2s linear infinite;
+            z-index: 10;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            50% { top: 100%; }
+            100% { top: 0; }
+        }
+
+        #face-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 5;
+        }
+
+        #snapshot-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 20;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800">
+
+    <nav class="bg-white border-b border-gray-100 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-2">
+             <div class="text-xs font-bold leading-tight">
+                <span class="text-orange-500">PAF</span> <span class="text-blue-900 italic">interactive</span><br>
+                <span class="text-red-600 text-sm tracking-tighter uppercase">Augmented Reality</span>
+             </div>
+        </div>
+
+        <div class="hidden md:flex items-center gap-6 font-semibold text-gray-500">
+            <a href="dashboard.html" class="flex items-center gap-2 hover:text-blue-600">🏠 Dashboard</a>
+            <a href="time.html" class="flex items-center gap-2 text-blue-600 bg-blue-50 px-4 py-2 rounded-xl">👤 Time-in/Time-out</a>
+            <a href="news.html" class="flex items-center gap-2 hover:text-blue-600">📰 News/Updates</a>
+            <a href="manage.html" class="flex items-center gap-2 hover:text-blue-600">👥 Manage Users</a>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div class="relative">
+                <div id="profileBtn" class="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100 cursor-pointer hover:bg-gray-100 transition-all">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=aug" alt="avatar" class="w-7 h-7 rounded-full bg-purple-500">
+                    <span id="navAdminName" class="text-sm font-bold">Admin</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                </div>
+                <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-[60]">
+                    <div class="px-4 py-2 border-b border-gray-50 mb-1">
+                        <p class="text-[10px] text-gray-400 uppercase font-bold">Admin Account</p>
+                        <p id="navAdminEmail" class="text-xs font-semibold truncate text-blue-900">admin@paf.com</p>
+                    </div>
+                    <button id="logoutBtn" class="w-full text-left px-4 py-2 text-sm text-red-600 font-bold hover:bg-red-50 flex items-center gap-2 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                        Sign out
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div id="actionModal" class="modal fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-[420px] rounded-3xl overflow-hidden shadow-2xl transition-all">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h2 id="modalTitle" class="text-md font-black text-slate-900 uppercase tracking-tight">Action</h2>
+                <button id="closeModalBtn" class="text-gray-400 hover:text-red-500 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            
+            <form id="actionForm" class="p-6 space-y-4">
+                <div id="aiStatus" class="text-[10px] font-bold text-center py-1 rounded-full bg-gray-100 text-gray-500 italic">Initializing Face Scanner...</div>
+
+                <div class="relative w-full aspect-square max-w-[280px] mx-auto bg-black rounded-2xl overflow-hidden shadow-inner border-2 border-blue-50" id="video-wrapper">
+                    <div id="scan-line" class="scanner-line hidden"></div>
+                    <video id="video" autoplay playsinline muted class="w-full h-full object-cover"></video>
+                    <canvas id="face-canvas"></canvas>
+                    <canvas id="snapshot-canvas" class="hidden"></canvas>
+                </div>
+                
+                <button type="button" id="snapBtn" class="w-full bg-slate-800 text-white py-2.5 rounded-xl font-bold text-xs hover:bg-slate-900 transition-all flex items-center justify-center gap-2">
+                    📸 Capture Photo (Manual)
+                </button>
+
+                <div class="space-y-3">
+                    <div id="idFieldContainer">
+                        <label class="text-[10px] font-bold uppercase text-gray-400 ml-1">Admin ID (Identity Verified)</label>
+                        <input type="text" id="inputID" readonly placeholder="Scanning..." 
+                            class="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-100 outline-none text-sm font-bold text-blue-600">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase text-gray-400 ml-1">Full Name</label>
+                        <input type="text" id="inputName" required placeholder="Enter full name..." 
+                            class="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500/20 text-sm">
+                    </div>
+                    <div id="emailFieldContainer">
+                        <label class="text-[10px] font-bold uppercase text-gray-400 ml-1">Email Address</label>
+                        <input type="email" id="inputEmail" placeholder="juan@gmail.com" 
+                            class="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500/20 text-sm">
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
+                    Confirm Action
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <main class="max-w-[1400px] mx-auto p-8 transition-all space-y-6">
+        <div class="flex items-center justify-between bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+            <h1 class="text-xl font-black text-slate-800">Attendance Log</h1>
+            <div class="flex items-center gap-3">
+                <button onclick="openModal('time-in')" class="bg-emerald-600 text-white px-5 py-2.5 rounded-xl text-xs uppercase font-bold tracking-wider hover:bg-emerald-700 transition-all shadow-md shadow-emerald-100 flex items-center gap-2">
+                    🕒 Time-in
+                </button>
+                <button onclick="openModal('time-out')" class="bg-red-600 text-white px-5 py-2.5 rounded-xl text-xs uppercase font-bold tracking-wider hover:bg-red-700 transition-all shadow-md shadow-red-100 flex items-center gap-2">
+                    🕒 Time-out
+                </button>
+                <div class="h-6 w-[1px] bg-gray-200 mx-1"></div>
+                <button onclick="openModal('register')" class="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-xs uppercase font-bold tracking-wider hover:bg-blue-700 transition-all shadow-md shadow-blue-100 flex items-center gap-2">
+                    ➕ Register Admin
+                </button>
+                <div class="h-6 w-[1px] bg-gray-200 mx-1"></div>
+                <button onclick="window.exportToExcel()" class="bg-emerald-100 text-emerald-700 px-5 py-2.5 rounded-xl text-xs uppercase font-bold tracking-wider hover:bg-emerald-200 transition-all flex items-center gap-2">
+                    📊 Excel
+                </button>
+                <button onclick="window.exportToPDF()" class="bg-red-100 text-red-700 px-5 py-2.5 rounded-xl text-xs uppercase font-bold tracking-wider hover:bg-red-200 transition-all flex items-center gap-2">
+                    📕 PDF
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-gray-50 text-gray-600 font-bold border-b border-gray-200">
+                    <tr>
+                        <th class="px-6 py-5">ID</th>
+                        <th class="px-6 py-5">Email</th>
+                        <th class="px-6 py-5">Time-in</th>
+                        <th class="px-6 py-5">Time-out</th>
+                    </tr>
+                </thead>
+                <tbody id="attendanceTableBody">
+                    <tr class="h-64">
+                        <td colspan="4" class="text-center text-gray-400 font-medium italic">
+                            Loading attendance records...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, onSnapshot, query, orderBy, setDoc, doc, serverTimestamp, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyArXdGOgHeeoX2iqegUvpg5l-eF02SUE-Y",
+        authDomain: "paf06-7d7cb.firebaseapp.com",
+        projectId: "paf06-7d7cb",
+        storageBucket: "paf06-7d7cb.firebasestorage.app",
+        messagingSenderId: "661740924808",
+        appId: "1:661740924808:web:6b00c1341f34e9eb81143d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/duzlklts9/image/upload";
+    const UPLOAD_PRESET = "paf_preset";
+
+    let faceMatcher = null;
+    let detectionInterval = null;
+    const aiStatus = document.getElementById('aiStatus');
+    const faceCanvas = document.getElementById('face-canvas');
+    const scanLine = document.getElementById('scan-line');
+    const snapshotCanvas = document.getElementById('snapshot-canvas');
+
+    async function loadAI() {
+        const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
+        try {
+            await Promise.all([
+                faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
+                faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+                faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+            ]);
+            aiStatus.innerText = "Scanner Ready. Loading database...";
+            await trainAdminData();
+        } catch (e) {
+            aiStatus.innerText = "Scanner Offline.";
+        }
+    }
+
+    async function trainAdminData() {
+        try {
+            const adminSnap = await getDocs(collection(db, "admin"));
+            const labeledDescriptors = await Promise.all(
+                adminSnap.docs.map(async (adminDoc) => {
+                    const data = adminDoc.data();
+                    if (!data.profileUrl) return null;
+                    const img = await faceapi.fetchImage(data.profileUrl);
+                    const detection = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
+                    return detection ? new faceapi.LabeledFaceDescriptors(`${adminDoc.id}|${data.fullName}`, [detection.descriptor]) : null;
+                })
+            );
+            const validDescriptors = labeledDescriptors.filter(d => d !== null);
+            if (validDescriptors.length > 0) {
+                faceMatcher = new faceapi.FaceMatcher(validDescriptors, 0.6);
+                aiStatus.innerText = "BIOMETRIC SCANNER ACTIVE";
+                aiStatus.style.color = "#10b981";
+            }
+        } catch (err) {
+            aiStatus.innerText = "Database Sync Failed.";
+        }
+    }
+
+    const actionModal = document.getElementById('actionModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const submitBtn = document.getElementById('submitBtn');
+    const video = document.getElementById('video');
+    const snapBtn = document.getElementById('snapBtn');
+    
+    let currentMode = ''; 
+    let capturedImage = null;
+    let stream = null;
+
+    window.openModal = async (mode) => {
+        currentMode = mode;
+        actionModal.classList.add('flex');
+        
+        video.classList.remove('hidden');
+        faceCanvas.classList.remove('hidden');
+        snapshotCanvas.classList.add('hidden');
+        document.getElementById('actionForm').reset();
+        capturedImage = null;
+
+        if (mode === 'register') {
+            modalTitle.innerText = "New Admin Registration";
+            submitBtn.innerText = "Complete Registration";
+            aiStatus.innerText = "PHOTO CAPTURE MODE";
+            aiStatus.style.color = "#3b82f6";
+            
+            scanLine.classList.add('hidden');
+            document.getElementById('idFieldContainer').style.display = 'none';
+            document.getElementById('emailFieldContainer').style.display = 'block';
+            document.getElementById('inputEmail').required = true;
+            document.getElementById('inputName').readOnly = false;
+        } else {
+            modalTitle.innerText = mode === 'time-in' ? "Admin Time-in" : "Admin Time-out";
+            submitBtn.innerText = mode === 'time-in' ? "Confirm Time-in" : "Confirm Time-out";
+            aiStatus.innerText = "BIOMETRIC SCANNER ACTIVE";
+            aiStatus.style.color = "#10b981";
+
+            scanLine.classList.remove('hidden');
+            document.getElementById('idFieldContainer').style.display = 'block';
+            document.getElementById('emailFieldContainer').style.display = 'none';
+            document.getElementById('inputName').readOnly = true;
+        }
+
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { width: 500, height: 500, facingMode: "user" } 
+            });
+            video.srcObject = stream;
+            video.onloadedmetadata = () => {
+                const displaySize = { width: video.clientWidth, height: video.clientHeight };
+                faceapi.matchDimensions(faceCanvas, displaySize);
+                if (faceMatcher && mode !== 'register') startFaceDetection(displaySize);
+            };
+        } catch (err) {
+            alert("Camera blocked.");
+        }
+    };
+
+    function startFaceDetection(displaySize) {
+        if(detectionInterval) clearInterval(detectionInterval);
+        detectionInterval = setInterval(async () => {
+            if (video.paused || video.ended || !faceMatcher || currentMode === 'register') return;
+            
+            const detections = await faceapi.detectAllFaces(video).withFaceLandmarks().withFaceDescriptors();
+            const resizedDetections = faceapi.resizeResults(detections, displaySize);
+            
+            faceCanvas.getContext('2d').clearRect(0, 0, faceCanvas.width, faceCanvas.height);
+            
+            resizedDetections.forEach(detection => {
+                const match = faceMatcher.findBestMatch(detection.descriptor);
+                const box = detection.detection.box;
+                
+                const drawBox = new faceapi.draw.DrawBox(box, { 
+                    label: match.label === 'unknown' ? 'Scanning...' : match.label.split('|')[1],
+                    boxColor: match.label === 'unknown' ? '#ef4444' : '#10b981'
+                });
+                drawBox.draw(faceCanvas);
+
+                if (match.label !== 'unknown') {
+                    const [id, name] = match.label.split('|');
+                    document.getElementById('inputID').value = id;
+                    document.getElementById('inputName').value = name;
+                }
+            });
+        }, 100);
+    }
+
+    const stopCamera = () => {
+        clearInterval(detectionInterval);
+        if (stream) stream.getTracks().forEach(track => track.stop());
+        actionModal.classList.remove('flex');
+        scanLine.classList.add('hidden');
+        faceCanvas.getContext('2d').clearRect(0, 0, faceCanvas.width, faceCanvas.height);
+        snapshotCanvas.getContext('2d').clearRect(0, 0, snapshotCanvas.width, snapshotCanvas.height);
+        capturedImage = null;
+    };
+
+    document.getElementById('closeModalBtn').onclick = stopCamera;
+
+    snapBtn.onclick = () => {
+        const context = snapshotCanvas.getContext('2d');
+        snapshotCanvas.width = video.videoWidth;
+        snapshotCanvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
+        capturedImage = snapshotCanvas.toDataURL('image/jpeg');
+        video.classList.add('hidden');
+        faceCanvas.classList.add('hidden');
+        snapshotCanvas.classList.remove('hidden');
+        aiStatus.innerText = "PHOTO CAPTURED";
+        aiStatus.style.color = "#10b981";
+    };
+
+    document.getElementById('actionForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('inputID').value;
+        const name = document.getElementById('inputName').value;
+        const email = document.getElementById('inputEmail').value;
+
+        if (!capturedImage) {
+            const context = snapshotCanvas.getContext('2d');
+            snapshotCanvas.width = video.videoWidth;
+            snapshotCanvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
+            capturedImage = snapshotCanvas.toDataURL('image/jpeg');
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Uploading & Saving...";
+
+        try {
+            const formData = new FormData();
+            formData.append('file', capturedImage);
+            formData.append('upload_preset', UPLOAD_PRESET);
+            const cloudRes = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData });
+            const cloudData = await cloudRes.json();
+            if (!cloudData.secure_url) throw new Error("Cloudinary upload failed.");
+
+            if (currentMode === 'register') {
+                const randomID = String(Math.floor(100000 + Math.random() * 900000)).padStart(6, '0');
+                const customDocID = `PAF-${randomID}`;
+                await setDoc(doc(db, "admin", customDocID), {
+                    fullName: name,
+                    email: email,
+                    profileUrl: cloudData.secure_url,
+                    role: "admin_staff",
+                    timestamp: serverTimestamp()
+                });
+                alert(`Registered Successfully: ${customDocID}`);
+                await trainAdminData();
+            } else {
+                const type = currentMode === 'time-in' ? 'timeIn' : 'timeOut';
+                const currentTime = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                await addDoc(collection(db, "attendance"), {
+                    adminID: id,
+                    name: name,
+                    type: type,
+                    time: currentTime,
+                    profileUrl: cloudData.secure_url,
+                    timestamp: serverTimestamp()
+                });
+                alert(`Success: ${name}`);
+            }
+            stopCamera();
+        } catch (error) {
+            alert("Error: " + error.message);
+        } finally {
+            submitBtn.disabled = false;
+        }
+    };
+
+    onAuthStateChanged(auth, (user) => {
+        if (!user) window.location.href = "index.html";
+        else {
+            document.getElementById('navAdminName').innerText = user.email.split('@')[0];
+            document.getElementById('navAdminEmail').innerText = user.email;
+        }
+    });
+
+    document.getElementById('profileBtn').onclick = (e) => {
+        e.stopPropagation();
+        document.getElementById('profileDropdown').classList.toggle('show');
+    };
+    window.onclick = () => document.getElementById('profileDropdown').classList.remove('show');
+    document.getElementById('logoutBtn').onclick = () => signOut(auth);
+
+    onSnapshot(query(collection(db, "attendance"), orderBy("timestamp", "desc")), (snapshot) => {
+        const tableBody = document.getElementById('attendanceTableBody');
+        tableBody.innerHTML = '';
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            const row = document.createElement('tr');
+            row.className = "border-t border-gray-50 hover:bg-gray-50 transition-colors";
+            row.innerHTML = `
+                <td class="px-6 py-4 text-xs font-bold text-blue-600">#${data.adminID || '---'}</td>
+                <td class="px-6 py-4 text-sm font-medium text-slate-700">${data.name || 'N/A'}</td>
+                <td class="px-6 py-4 text-xs text-emerald-600 font-bold">${data.type === 'timeIn' ? data.time : '--:--'}</td>
+                <td class="px-6 py-4 text-xs text-red-600 font-bold">${data.type === 'timeOut' ? data.time : '--:--'}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    });
+
+    // --- EXPORT LOGIC ---
+    window.exportToExcel = () => {
+        const table = document.getElementById("attendanceTableBody");
+        const rows = Array.from(table.querySelectorAll("tr"));
+        if (rows.length === 0 || rows[0].innerText.includes("Loading")) {
+            alert("No data to export.");
+            return;
+        }
+        const data = rows.map(row => {
+            const cols = row.querySelectorAll("td");
+            return {
+                "ID": cols[0].innerText,
+                "Full Name": cols[1].innerText,
+                "Time-in": cols[2].innerText,
+                "Time-out": cols[3].innerText
+            };
+        });
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance");
+        XLSX.writeFile(workbook, `PAF_Attendance_${new Date().toLocaleDateString()}.xlsx`);
+    };
+
+    window.exportToPDF = () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFontSize(18);
+        doc.text("PAF Interactive - Attendance Report", 14, 20);
+        doc.setFontSize(10);
+        doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 28);
+        const tableBody = document.getElementById("attendanceTableBody");
+        const rows = Array.from(tableBody.querySelectorAll("tr")).map(row => {
+            return Array.from(row.querySelectorAll("td")).map(td => td.innerText);
+        });
+        if (rows.length === 0 || rows[0][0].includes("Loading")) {
+            alert("No data to export.");
+            return;
+        }
+        doc.autoTable({
+            head: [['ID', 'Full Name', 'Time-in', 'Time-out']],
+            body: rows,
+            startY: 35,
+            theme: 'grid',
+            headStyles: { fillColor: [30, 58, 138] },
+        });
+        doc.save(`PAF_Report_${new Date().toLocaleDateString()}.pdf`);
+    };
+
+    loadAI();
+</script>
+</body>
+</html>

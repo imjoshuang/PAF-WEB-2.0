@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <link rel="icon" type="image/png" href="C:\Users\micha\Downloads\CANCHO\websitecode\imgs\PAF_Seal.png">
+    <title>PAF AR Dashboard</title>
+    <style>
+        #profileDropdown { display: none; }
+        #profileDropdown.show { display: block; }
+        #reportModal { display: none; }
+        #reportModal.show { display: flex; }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800">
+
+    <nav class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-2">
+             <div class="text-xs font-bold leading-tight">
+                <span class="text-orange-500">PAF</span> <span class="text-blue-900 italic">interactive</span><br>
+                <span class="text-red-600 text-sm tracking-tighter uppercase">Augmented Reality</span>
+             </div>
+        </div>
+
+        <div class="hidden md:flex items-center gap-8 font-semibold text-gray-600">
+            <a href="#" class="flex items-center gap-2 text-blue-600 bg-blue-50 px-4 py-2 rounded-xl">
+                <span>🏠 Dashboard</span>
+            </a>
+            <a href="time.html" class="flex items-center gap-2 hover:text-blue-600">👤 Time-in/Time-out</a>
+            <a href="news.html" class="flex items-center gap-2 hover:text-blue-600">📰 News/Updates</a>
+            <a href="manage.html" class="flex items-center gap-2 hover:text-blue-600">👥 Manage Users</a>
+        </div>
+
+        <div class="relative">
+            <div id="profileBtn" class="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full border border-gray-200 cursor-pointer hover:bg-gray-200 transition-all">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=aug" alt="avatar" class="w-7 h-7 rounded-full bg-purple-500">
+                <span id="navAdminName" class="text-sm font-bold">Admin</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+            </div>
+
+            <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-[60]">
+                <div class="px-4 py-2 border-b border-gray-50 mb-1">
+                    <p class="text-[10px] text-gray-400 uppercase font-bold">Admin Account</p>
+                    <p id="navAdminEmail" class="text-xs font-semibold truncate text-blue-900">admin@paf.com</p>
+                </div>
+                <button id="logoutBtn" class="w-full text-left px-4 py-2 text-sm text-red-600 font-bold hover:bg-red-50 flex items-center gap-2 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                    Sign out
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-[1600px] mx-auto p-6 flex flex-col lg:flex-row gap-6">
+        <div class="flex-1 space-y-8">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h1 class="text-3xl font-black text-slate-900">Welcome, <span id="welcomeAdminName">Admin</span>!</h1>
+                    <p class="text-gray-500 text-sm">Here's an overview of the latest metrics and analytics.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="openReportModal()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-700 transition-colors flex items-center gap-2">
+                        <span>📊</span> Download Report
+                    </button>
+                    <select id="timeFilter" class="bg-white border border-gray-200 rounded-lg px-4 py-2 text-sm outline-none shadow-sm cursor-pointer font-bold">
+                        <option value="daily">Today</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly" selected>Monthly</option>
+                        <option value="yearly">Annually</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-gray-100 h-80 relative shadow-sm overflow-hidden">
+                <canvas id="visitorChart" class="w-full h-full"></canvas>
+            </div>
+
+            <div class="space-y-4">
+                <h2 class="text-xl font-black text-slate-900">Latest Activity</h2>
+                <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 text-gray-400 text-[10px] uppercase font-black tracking-wider">
+                            <tr>
+                                <th class="px-6 py-4">ID</th>
+                                <th class="px-6 py-4">Email</th>
+                                <th class="px-6 py-4">Status</th>
+                                <th class="px-6 py-4">Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody" class="divide-y divide-gray-50">
+                            <tr>
+                                <td colspan="4" class="px-6 py-16 text-center text-gray-400 font-bold italic">No active records found.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-full lg:w-80 space-y-4">
+            <div class="bg-blue-50 p-5 rounded-3xl border border-blue-100 relative group transition-all hover:shadow-md">
+                <h3 class="font-black text-slate-900 mb-4 uppercase text-xs tracking-widest text-blue-900">Visitors</h3>
+                <div class="bg-white p-4 rounded-2xl flex items-center justify-between shadow-sm">
+                    <div>
+                        <div id="visitorCount" class="text-3xl font-black text-slate-900">0</div>
+                        <div class="text-[9px] text-gray-400 uppercase font-black leading-tight">Total filtered<br>visitors</div>
+                    </div>
+                    <div class="bg-blue-600 p-2.5 rounded-xl text-white shadow-lg shadow-blue-200">👥</div>
+                </div>
+            </div>
+
+            <div class="bg-blue-50 p-5 rounded-3xl border border-blue-100 transition-all hover:shadow-md">
+                <h3 class="font-black text-slate-900 mb-4 uppercase text-xs tracking-widest text-blue-900">Active Users</h3>
+                <div class="bg-white p-4 rounded-2xl flex items-center justify-between shadow-sm">
+                    <div>
+                        <div id="activeUserCount" class="text-3xl font-black text-slate-900">0</div>
+                        <div class="text-[9px] text-gray-400 uppercase font-black leading-tight">Users currently<br>logged in</div>
+                    </div>
+                    <div class="bg-emerald-500 p-2.5 rounded-xl text-white shadow-lg shadow-emerald-100">📈</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Report Download Modal -->
+    <div id="reportModal" class="fixed inset-0 bg-black/60 z-[110] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl">
+            <div class="p-6 border-b border-gray-100">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-black text-slate-900">Download User Report</h2>
+                    <button onclick="closeReportModal()" class="text-gray-400 hover:text-gray-600">✕</button>
+                </div>
+                <p class="text-gray-500 text-sm mt-1">Export user data in your preferred format</p>
+            </div>
+
+            <div class="p-6 space-y-6">
+                <!-- Format Selection -->
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Format</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button id="csvBtn" onclick="selectFormat('csv')" class="p-4 border-2 border-emerald-500 bg-emerald-50 rounded-xl text-center transition-all">
+                            <div class="text-2xl mb-2">📄</div>
+                            <div class="font-bold text-emerald-700">CSV</div>
+                            <div class="text-[10px] text-gray-500 mt-1">Excel/Spreadsheet</div>
+                        </button>
+                        <button id="pdfBtn" onclick="selectFormat('pdf')" class="p-4 border-2 border-gray-200 bg-white rounded-xl text-center transition-all hover:border-red-400">
+                            <div class="text-2xl mb-2">📊</div>
+                            <div class="font-bold text-slate-700">PDF</div>
+                            <div class="text-[10px] text-gray-500 mt-1">Printable Document</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Date Range -->
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Date Range</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[10px] text-gray-500 mb-1 block">From</label>
+                            <input type="date" id="dateFrom" class="w-full px-3 py-2 border border-gray-200 rounded-lg outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-gray-500 mb-1 block">To</label>
+                            <input type="date" id="dateTo" class="w-full px-3 py-2 border border-gray-200 rounded-lg outline-none text-sm">
+                        </div>
+                    </div>
+                    <div class="flex gap-2 mt-2">
+                        <button onclick="setDateRange('today')" class="text-xs px-3 py-1 border border-gray-200 rounded-lg hover:bg-gray-50">Today</button>
+                        <button onclick="setDateRange('week')" class="text-xs px-3 py-1 border border-gray-200 rounded-lg hover:bg-gray-50">This Week</button>
+                        <button onclick="setDateRange('month')" class="text-xs px-3 py-1 border border-gray-200 rounded-lg hover:bg-gray-50">This Month</button>
+                        <button onclick="setDateRange('all')" class="text-xs px-3 py-1 border border-gray-200 rounded-lg hover:bg-gray-50">All Time</button>
+                    </div>
+                </div>
+
+                <!-- User Selection -->
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Users to Include</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="userScope" value="filtered" checked class="text-blue-600">
+                            <span class="text-sm">Currently filtered users (<span id="filteredCount">0</span> users)</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="userScope" value="all" class="text-blue-600">
+                            <span class="text-sm">All registered users (<span id="totalCount">0</span> users)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Data Fields -->
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Include Fields</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="flex items-center gap-2">
+                            <input type="checkbox" checked class="text-blue-600" data-field="name"> Full Name
+                        </label>
+                        <label class="flex items-center gap-2">
+                            <input type="checkbox" checked class="text-blue-600" data-field="email"> Email
+                        </label>
+                        <label class="flex items-center gap-2">
+                            <input type="checkbox" checked class="text-blue-600" data-field="phone"> Phone
+                        </label>
+                        <label class="flex items-center gap-2">
+                            <input type="checkbox" checked class="text-blue-600" data-field="status"> Status
+                        </label>
+                        <label class="flex items-center gap-2">
+                            <input type="checkbox" checked class="text-blue-600" data-field="registration"> Registration Date
+                        </label>
+                        <label class="flex items-center gap-2">
+                            <input type="checkbox" class="text-blue-600" data-field="lastActivity"> Last Activity
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 border-t border-gray-100 bg-gray-50">
+                <button onclick="generateReport()" id="generateBtn" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+                    <span>📥</span> Generate & Download Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, onSnapshot, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyArXdGOgHeeoX2iqegUvpg5l-eF02SUE-Y",
+        authDomain: "paf06-7d7cb.firebaseapp.com",
+        projectId: "paf06-7d7cb",
+        storageBucket: "paf06-7d7cb.firebasestorage.app",
+        messagingSenderId: "661740924808",
+        appId: "1:661740924808:web:6b00c1341f34e9eb81143d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const tableBody = document.getElementById('userTableBody');
+    const timeFilter = document.getElementById('timeFilter');
+    let allUsersData = [];
+    let filteredUsersData = [];
+    let selectedFormat = 'csv';
+
+    // --- 1. INITIALIZE CHART ---
+    const ctx = document.getElementById('visitorChart').getContext('2d');
+    let visitorChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [], 
+            datasets: [{
+                label: 'Visitors',
+                data: [], 
+                borderColor: '#2563eb',
+                backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                borderWidth: 4, fill: true, tension: 0.4,
+                pointRadius: 4, pointBackgroundColor: '#ffffff', pointBorderColor: '#2563eb'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1, font: { weight: 'bold' } } },
+                x: { ticks: { font: { weight: 'bold' } } }
+            }
+        }
+    });
+
+    // --- 2. REAL-TIME DATA LISTENER ---
+    onSnapshot(query(collection(db, "users"), orderBy("timestamp", "desc")), (snapshot) => {
+        allUsersData = [];
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            allUsersData.push({ 
+                id: doc.id, 
+                ...data,
+                registrationDate: data.timestamp ? new Date(data.timestamp.seconds * 1000) : null,
+                lastActivity: data.timestamp ? new Date(data.timestamp.seconds * 1000) : null
+            });
+        });
+        // Update counts
+        if (document.getElementById('totalCount')) {
+            document.getElementById('totalCount').textContent = allUsersData.length;
+        }
+        if (document.getElementById('filteredCount')) {
+            document.getElementById('filteredCount').textContent = filteredUsersData.length;
+        }
+        applyFilterAndRender(); 
+    });
+
+    // --- 3. FILTER & RENDER LOGIC ---
+    function applyFilterAndRender() {
+        const filter = timeFilter.value;
+        const now = new Date();
+        filteredUsersData = [];
+        let labels = [];
+        let dataCounts = [];
+
+        // Filter data base sa oras
+        filteredUsersData = allUsersData.filter(user => {
+            if (!user.timestamp) return false;
+            const uDate = new Date(user.timestamp.seconds * 1000);
+            if (filter === 'daily') return uDate.toDateString() === now.toDateString();
+            if (filter === 'weekly') return (now - uDate) <= 7 * 24 * 60 * 60 * 1000;
+            if (filter === 'monthly') return uDate.getMonth() === now.getMonth() && uDate.getFullYear() === now.getFullYear();
+            if (filter === 'yearly') return uDate.getFullYear() === now.getFullYear();
+            return true;
+        });
+
+        // Update filtered count in modal
+        if (document.getElementById('filteredCount')) {
+            document.getElementById('filteredCount').textContent = filteredUsersData.length;
+        }
+
+        // I-set ang Chart Labels at Data base sa filter
+        if (filter === 'daily') {
+            labels = ['12AM', '4AM', '8AM', '12PM', '4PM', '8PM', '11PM'];
+            dataCounts = new Array(7).fill(0);
+            filteredUsersData.forEach(u => {
+                const hour = new Date(u.timestamp.seconds * 1000).getHours();
+                dataCounts[Math.floor(hour / 4)]++;
+            });
+        } else if (filter === 'weekly') {
+            labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            dataCounts = new Array(7).fill(0);
+            filteredUsersData.forEach(u => {
+                let day = new Date(u.timestamp.seconds * 1000).getDay();
+                dataCounts[day === 0 ? 6 : day - 1]++;
+            });
+        } else if (filter === 'monthly') {
+            labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+            dataCounts = new Array(4).fill(0);
+            filteredUsersData.forEach(u => {
+                const date = new Date(u.timestamp.seconds * 1000).getDate();
+                dataCounts[Math.min(Math.floor((date - 1) / 7), 3)]++;
+            });
+        } else {
+            labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            dataCounts = new Array(12).fill(0);
+            filteredUsersData.forEach(u => {
+                dataCounts[new Date(u.timestamp.seconds * 1000).getMonth()]++;
+            });
+        }
+
+        // Update UI
+        document.getElementById('visitorCount').innerText = filteredUsersData.length;
+        visitorChart.data.labels = labels;
+        visitorChart.data.datasets[0].data = dataCounts;
+        visitorChart.update();
+
+        // Render Table
+        tableBody.innerHTML = '';
+        if (filteredUsersData.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="4" class="px-6 py-16 text-center text-gray-400 font-bold italic">No records found for this period.</td></tr>';
+        } else {
+            filteredUsersData.forEach(user => {
+                const statusColor = user.status === "online" ? "text-emerald-600" : "text-gray-400";
+                const row = document.createElement('tr');
+                row.className = "border-t border-gray-50 hover:bg-gray-50 transition-colors";
+                row.innerHTML = `
+                    <td class="px-6 py-4 text-xs font-bold text-blue-600">#${user.id.substring(0, 6)}</td>
+                    <td class="px-6 py-4 text-sm font-medium text-slate-700">${user.email || 'N/A'}</td>
+                    <td class="px-6 py-4 text-xs font-bold ${statusColor} uppercase italic">● ${user.status || 'offline'}</td>
+                    <td class="px-6 py-4 text-xs text-slate-400 font-medium text-right italic">
+                        ${user.timestamp ? new Date(user.timestamp.seconds * 1000).toLocaleString() : 'Just now'}
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+    }
+
+    timeFilter.addEventListener('change', applyFilterAndRender);
+
+    // --- 4. ACTIVE USERS & AUTH ---
+    onSnapshot(query(collection(db, "users"), where("status", "==", "online")), (snapshot) => {
+        document.getElementById('activeUserCount').innerText = snapshot.size;
+    });
+
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            window.location.href = "index.html";
+        } else {
+            const adminName = user.email.split('@')[0];
+            document.getElementById('navAdminName').innerText = adminName;
+            document.getElementById('navAdminEmail').innerText = user.email;
+            document.getElementById('welcomeAdminName').innerText = adminName;
+        }
+    });
+
+    const profileBtn = document.getElementById('profileBtn');
+    const profileDropdown = document.getElementById('profileDropdown');
+    profileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        profileDropdown.classList.toggle('show');
+    });
+
+    window.addEventListener('click', () => profileDropdown.classList.remove('show'));
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        signOut(auth).then(() => window.location.href = "index.html");
+    });
+
+    // --- REPORT MODAL FUNCTIONS ---
+    window.openReportModal = function() {
+        // Set default date range to current month
+        const today = new Date();
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+        const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        
+        document.getElementById('dateFrom').valueAsDate = firstDay;
+        document.getElementById('dateTo').valueAsDate = lastDay;
+        
+        // Set initial counts
+        document.getElementById('filteredCount').textContent = filteredUsersData.length;
+        document.getElementById('totalCount').textContent = allUsersData.length;
+        
+        // Select CSV by default
+        selectFormat('csv');
+        
+        document.getElementById('reportModal').classList.add('show');
+    };
+
+    window.closeReportModal = function() {
+        document.getElementById('reportModal').classList.remove('show');
+    };
+
+    window.selectFormat = function(format) {
+        selectedFormat = format;
+        
+        const csvBtn = document.getElementById('csvBtn');
+        const pdfBtn = document.getElementById('pdfBtn');
+        
+        if (format === 'csv') {
+            csvBtn.classList.remove('border-gray-200', 'bg-white');
+            csvBtn.classList.add('border-emerald-500', 'bg-emerald-50');
+            pdfBtn.classList.remove('border-emerald-500', 'bg-emerald-50');
+            pdfBtn.classList.add('border-gray-200', 'bg-white');
+        } else {
+            pdfBtn.classList.remove('border-gray-200', 'bg-white');
+            pdfBtn.classList.add('border-emerald-500', 'bg-emerald-50');
+            csvBtn.classList.remove('border-emerald-500', 'bg-emerald-50');
+            csvBtn.classList.add('border-gray-200', 'bg-white');
+        }
+    };
+
+    window.setDateRange = function(range) {
+        const today = new Date();
+        let fromDate, toDate;
+        
+        switch(range) {
+            case 'today':
+                fromDate = today;
+                toDate = today;
+                break;
+            case 'week':
+                // Get Monday of this week
+                fromDate = new Date(today);
+                fromDate.setDate(today.getDate() - today.getDay() + 1);
+                toDate = new Date();
+                break;
+            case 'month':
+                fromDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                toDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                break;
+            case 'all':
+                fromDate = null;
+                toDate = null;
+                break;
+        }
+        
+        if (fromDate) {
+            document.getElementById('dateFrom').valueAsDate = fromDate;
+        } else {
+            document.getElementById('dateFrom').value = '';
+        }
+        
+        if (toDate) {
+            document.getElementById('dateTo').valueAsDate = toDate;
+        } else {
+            document.getElementById('dateTo').value = '';
+        }
+    };
+
+    function getSelectedFields() {
+        const fields = [];
+        document.querySelectorAll('input[data-field]:checked').forEach(checkbox => {
+            fields.push(checkbox.getAttribute('data-field'));
+        });
+        return fields;
+    }
+
+    function filterUsersByDateRange(users) {
+        const dateFrom = document.getElementById('dateFrom').value;
+        const dateTo = document.getElementById('dateTo').value;
+        
+        if (!dateFrom && !dateTo) return users;
+        
+        const from = dateFrom ? new Date(dateFrom) : null;
+        const to = dateTo ? new Date(dateTo + 'T23:59:59') : null;
+        
+        return users.filter(user => {
+            if (!user.timestamp) return false;
+            const userDate = new Date(user.timestamp.seconds * 1000);
+            
+            let valid = true;
+            if (from && userDate < from) valid = false;
+            if (to && userDate > to) valid = false;
+            
+            return valid;
+        });
+    }
+
+    window.generateReport = async function() {
+        const btn = document.getElementById('generateBtn');
+        const originalText = btn.innerHTML;
+        
+        try {
+            // Show loading
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loader"></div> Generating...';
+            
+            // Get user scope
+            const userScope = document.querySelector('input[name="userScope"]:checked').value;
+            let users = userScope === 'filtered' ? filteredUsersData : allUsersData;
+            
+            // Apply date range filter
+            users = filterUsersByDateRange(users);
+            
+            if (users.length === 0) {
+                alert('No users found for the selected criteria.');
+                return;
+            }
+            
+            // Get selected fields
+            const selectedFields = getSelectedFields();
+            if (selectedFields.length === 0) {
+                alert('Please select at least one field to include.');
+                return;
+            }
+            
+            // Generate report based on format
+            if (selectedFormat === 'csv') {
+                generateCSV(users, selectedFields);
+            } else {
+                generatePDF(users, selectedFields);
+            }
+            
+            closeReportModal();
+            
+        } catch (error) {
+            console.error('Error generating report:', error);
+            alert('Error generating report. Please try again.');
+        } finally {
+            // Reset button
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    };
+
+    function generateCSV(users, fields) {
+        // Define field mappings
+        const fieldMap = {
+            'name': 'Full Name',
+            'email': 'Email Address',
+            'phone': 'Phone Number',
+            'status': 'Status',
+            'registration': 'Registration Date',
+            'lastActivity': 'Last Activity'
+        };
+        
+        // Create CSV headers
+        const headers = fields.map(field => fieldMap[field] || field);
+        const csvRows = [headers];
+        
+        // Add data rows
+        users.forEach(user => {
+            const row = fields.map(field => {
+                switch(field) {
+                    case 'name':
+                        return `"${user.fullName || 'N/A'}"`;
+                    case 'email':
+                        return `"${user.email || 'N/A'}"`;
+                    case 'phone':
+                        return `"${user.phone || 'N/A'}"`;
+                    case 'status':
+                        return `"${user.status || 'offline'}"`;
+                    case 'registration':
+                        return `"${user.timestamp ? new Date(user.timestamp.seconds * 1000).toLocaleDateString() : 'N/A'}"`;
+                    case 'lastActivity':
+                        return `"${user.timestamp ? new Date(user.timestamp.seconds * 1000).toLocaleString() : 'N/A'}"`;
+                    default:
+                        return '""';
+                }
+            });
+            csvRows.push(row);
+        });
+        
+        // Create CSV content
+        const csvContent = csvRows.map(row => row.join(',')).join('\n');
+        
+        // Create and download file
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        
+        const dateFrom = document.getElementById('dateFrom').value || 'all';
+        const dateTo = document.getElementById('dateTo').value || 'all';
+        const filename = `PAF_Users_Report_${dateFrom}_to_${dateTo}.csv`;
+        
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function generatePDF(users, fields) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Add title
+        doc.setFontSize(20);
+        doc.text('PAF User Report', 105, 20, null, null, 'center');
+        
+        // Add date range
+        doc.setFontSize(10);
+        const dateFrom = document.getElementById('dateFrom').value || 'All Time';
+        const dateTo = document.getElementById('dateTo').value || 'All Time';
+        doc.text(`Date Range: ${dateFrom} to ${dateTo}`, 105, 30, null, null, 'center');
+        doc.text(`Generated on: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`, 105, 35, null, null, 'center');
+        doc.text(`Total Users: ${users.length}`, 105, 40, null, null, 'center');
+        
+        // Define column headers
+        const headers = fields.map(field => {
+            switch(field) {
+                case 'name': return 'Full Name';
+                case 'email': return 'Email';
+                case 'phone': return 'Phone';
+                case 'status': return 'Status';
+                case 'registration': return 'Registered';
+                case 'lastActivity': return 'Last Activity';
+                default: return field;
+            }
+        });
+        
+        // Prepare data rows
+        const data = users.map(user => {
+            return fields.map(field => {
+                switch(field) {
+                    case 'name':
+                        return user.fullName || 'N/A';
+                    case 'email':
+                        return user.email || 'N/A';
+                    case 'phone':
+                        return user.phone || 'N/A';
+                    case 'status':
+                        return user.status || 'offline';
+                    case 'registration':
+                        return user.timestamp ? new Date(user.timestamp.seconds * 1000).toLocaleDateString() : 'N/A';
+                    case 'lastActivity':
+                        return user.timestamp ? new Date(user.timestamp.seconds * 1000).toLocaleString() : 'N/A';
+                    default:
+                        return 'N/A';
+                }
+            });
+        });
+        
+        // Add table
+        doc.autoTable({
+            head: [headers],
+            body: data,
+            startY: 50,
+            theme: 'striped',
+            headStyles: { fillColor: [37, 99, 235] },
+            margin: { top: 50 }
+        });
+        
+        // Add footer
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.text(`Page ${i} of ${pageCount}`, 105, 290, null, null, 'center');
+            doc.text('PAF Interactive - Augmented Reality System', 105, 295, null, null, 'center');
+        }
+        
+        // Save PDF
+        const filename = `PAF_Users_Report_${dateFrom}_to_${dateTo}.pdf`;
+        doc.save(filename);
+    }
+
+    // Add loader style
+    const style = document.createElement('style');
+    style.textContent = `
+        .loader {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    `;
+    document.head.appendChild(style);
+
+</script>
+</body>
+</html>

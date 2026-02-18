@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="C:\Users\micha\Downloads\CANCHO\websitecode\imgs\PAF_Seal.png">
+    <title>PAF Manage Users</title>
+    <style>
+        .dropdown-menu, #profileDropdown { display: none; }
+        .dropdown-menu.show, #profileDropdown.show { display: block !important; }
+        #detailsModal, #deleteConfirmModal, #addUserModal, #editUserModal { display: none; }
+        #detailsModal.show, #deleteConfirmModal.show, #addUserModal.show, #editUserModal.show { display: flex; }
+        #toast { transform: translateX(300px); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #toast.show { transform: translateX(0); opacity: 1; }
+        
+        #webcam-container { width: 100%; aspect-ratio: 4/3; background: #000; border-radius: 1rem; overflow: hidden; position: relative; }
+        #webcam-feed { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        #photo-result { width: 100%; height: 100%; object-fit: cover; display: none; transform: scaleX(-1); }
+
+        .error-text { font-size: 10px; color: #ef4444; font-weight: bold; margin-top: 2px; display: none; }
+        input.invalid { border-color: #ef4444 !important; background-color: #fef2f2; }
+        input.valid { border-color: #10b981 !important; }
+        
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #3b82f6; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Pagination Styles */
+        .pagination-btn { 
+            width: 32px; 
+            height: 32px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-radius: 8px; 
+            font-size: 12px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+        }
+        .pagination-btn:hover { background-color: #f1f5f9; }
+        .pagination-btn.active { background-color: #3b82f6; color: white; }
+        .pagination-btn.disabled { opacity: 0.5; cursor: not-allowed; }
+    </style>
+</head>
+<body class="bg-white font-sans text-slate-800">
+
+    <nav class="bg-white border-b border-gray-100 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-2">
+             <div class="text-xs font-bold leading-tight">
+                <span class="text-orange-500">PAF</span> <span class="text-blue-900 italic">interactive</span><br>
+                <span class="text-red-600 text-sm tracking-tighter uppercase">Augmented Reality</span>
+             </div>
+        </div>
+        <div class="hidden md:flex items-center gap-6 font-semibold text-gray-500">
+            <a href="dashboard.html" class="hover:text-blue-600">🏠 Dashboard</a>
+            <a href="time.html" class="hover:text-blue-600">👤 Time-in/Time-out</a>
+            <a href="news.html" class="hover:text-blue-600">📰 News/Updates</a>
+            <a href="manage.html" class="text-blue-600 bg-blue-50 px-4 py-2 rounded-xl">👥 Manage Users</a>
+        </div>
+        <div class="relative">
+            <div id="profileBtn" class="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100 cursor-pointer hover:bg-gray-200 transition-all">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=aug" alt="avatar" class="w-7 h-7 rounded-full bg-purple-500">
+                <span id="navAdminName" class="text-sm font-bold">Admin</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+            </div>
+            <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-[60]">
+                <div class="px-4 py-2 border-b border-gray-50 mb-1">
+                    <p class="text-[10px] text-gray-400 uppercase font-bold">Admin Account</p>
+                    <p id="navAdminEmail" class="text-xs font-semibold truncate text-blue-900">admin@paf.com</p>
+                </div>
+                <button id="logoutBtn" class="w-full text-left px-4 py-2 text-sm text-red-600 font-bold hover:bg-red-50 flex items-center gap-2 transition-colors">Sign out</button>
+            </div>
+        </div>
+    </nav>
+
+    <header class="max-w-[1600px] mx-auto px-8 pt-8">
+        <h1 class="text-4xl font-black text-slate-900">Manage Users</h1>
+        <p class="text-gray-500 font-medium mt-1">Administer user accounts, roles, and activities.</p>
+    </header>
+
+    <main class="max-w-[1600px] mx-auto p-8">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+            <h2 class="text-xl font-bold text-slate-800 self-start">User List</h2>
+            <div class="flex w-full md:w-auto gap-2">
+                <input type="text" id="searchInput" placeholder="Search by email..." class="w-full md:w-64 px-4 py-2 rounded-lg border border-gray-200 focus:border-blue-500 outline-none text-sm">
+                
+                <!-- Filter Dropdown -->
+                <div class="relative">
+                    <button id="filterBtn" class="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-50 transition-colors flex items-center gap-2">
+                        <span>🔍</span> Filter
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="filterDropdown" class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-40">
+                        <div class="px-4 py-2 border-b border-gray-100">
+                            <p class="text-[10px] text-gray-400 uppercase font-bold">Status Filter</p>
+                        </div>
+                        <button onclick="applyFilter('all')" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between">
+                            <span>All Users</span>
+                            <span id="filterAllCount" class="text-xs font-bold text-gray-400">0</span>
+                        </button>
+                        <button onclick="applyFilter('online')" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between">
+                            <span class="text-emerald-500">● Online</span>
+                            <span id="filterOnlineCount" class="text-xs font-bold text-gray-400">0</span>
+                        </button>
+                        <button onclick="applyFilter('offline')" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between">
+                            <span class="text-gray-400">● Offline</span>
+                            <span id="filterOfflineCount" class="text-xs font-bold text-gray-400">0</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Sort Dropdown -->
+                <div class="relative">
+                    <button id="sortBtn" class="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-50 transition-colors flex items-center gap-2">
+                        <span>↕️</span> Sort
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="sortDropdown" class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-40">
+                        <div class="px-4 py-2 border-b border-gray-100">
+                            <p class="text-[10px] text-gray-400 uppercase font-bold">Sort By Name</p>
+                        </div>
+                        <button onclick="applySort('name-asc')" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between">
+                            <span>A → Z</span>
+                            <span class="text-xs text-gray-400">Ascending</span>
+                        </button>
+                        <button onclick="applySort('name-desc')" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between">
+                            <span>Z → A</span>
+                            <span class="text-xs text-gray-400">Descending</span>
+                        </button>
+                        <button onclick="applySort('date-desc')" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between">
+                            <span>📅 Newest First</span>
+                            <span class="text-xs text-gray-400">Default</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <button onclick="openAddModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors flex items-center gap-2 shrink-0">
+                    <span>➕</span> Add User
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-gray-50 rounded-xl border border-gray-100 shadow-sm overflow-visible">
+            <div class="overflow-x-visible">
+                <table class="w-full text-left text-sm">
+                    <thead class="text-slate-900 font-bold border-b border-gray-200 bg-gray-100">
+                        <tr>
+                            <th class="px-6 py-4">Image</th>
+                            <th class="px-6 py-4">Full Name</th>
+                            <th class="px-6 py-4">Email</th>
+                            <th class="px-6 py-4">Phone</th>
+                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4">Latest Signin</th>
+                            <th class="px-6 py-4">Registration Date</th>
+                            <th class="px-6 py-4 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="manageTableBody" class="divide-y divide-gray-100">
+                        <tr><td colspan="8" class="px-6 py-16 text-center text-gray-400 font-bold italic">Loading users...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Pagination Controls -->
+        <div id="paginationControls" class="hidden mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="text-xs text-gray-500">
+                Showing <span id="paginationStart">1</span> to <span id="paginationEnd">15</span> of <span id="paginationTotal">0</span> users
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="prevPageBtn" class="pagination-btn disabled">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                
+                <div id="pageNumbers" class="flex items-center gap-1">
+                    <!-- Page numbers will be dynamically generated here -->
+                </div>
+                
+                <button id="nextPageBtn" class="pagination-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+                
+                <select id="rowsPerPage" class="text-xs border border-gray-200 rounded-lg px-2 py-1 bg-white">
+                    <option value="15">15 per page</option>
+                    <option value="30">30 per page</option>
+                    <option value="50">50 per page</option>
+                    <option value="100">100 per page</option>
+                </select>
+            </div>
+        </div>
+        
+        <div id="userCounter" class="mt-4 text-xs font-bold text-gray-500 uppercase"></div>
+    </main>
+
+    <div id="addUserModal" class="fixed inset-0 bg-black/60 z-[110] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-4xl w-full overflow-hidden shadow-2xl flex flex-col md:flex-row">
+            <div class="md:w-1/2 bg-slate-900 p-6 flex flex-col gap-4">
+                <div id="webcam-container">
+                    <video id="webcam-feed" autoplay playsinline></video>
+                    <img id="photo-result">
+                </div>
+                <div class="flex flex-col gap-2">
+                    <div class="flex gap-2">
+                        <button id="snap-btn" type="button" class="flex-1 bg-white text-slate-900 py-3 rounded-xl font-bold text-xs uppercase">Capture Photo</button>
+                        <button id="retake-btn" type="button" class="flex-1 bg-slate-700 text-white py-3 rounded-xl font-bold text-xs uppercase hidden">Retake</button>
+                    </div>
+                    <label class="w-full bg-slate-800 text-white/70 py-3 rounded-xl font-bold text-[10px] uppercase text-center cursor-pointer hover:bg-slate-700 transition-all border border-slate-700">
+                        📁 Upload from Laptop
+                        <input type="file" id="file-upload" accept="image/*" class="hidden">
+                    </label>
+                </div>
+                <p id="photo-error" class="text-[10px] text-red-400 text-center font-bold uppercase italic">Photo is required before creating account</p>
+            </div>
+
+            <div class="md:w-1/2 p-8 max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-black italic uppercase text-blue-600">Register New User</h2>
+                    <button onclick="closeModal('addUserModal')" class="text-gray-400 hover:text-gray-600">✕</button>
+                </div>
+                <form id="registerForm" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-gray-400">Full Name</label>
+                            <input type="text" id="regName" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl outline-none text-sm" placeholder="John Doe">
+                            <span id="name-err" class="error-text">At least 3 characters</span>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-gray-400">Phone Number</label>
+                            <input type="tel" id="regPhone" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl outline-none text-sm" placeholder="09xxxxxxxxx">
+                            <span id="phone-err" class="error-text">Enter valid PH number</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-gray-400">Email Address</label>
+                            <input type="email" id="regEmail" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl outline-none text-sm" placeholder="user@paf.com">
+                            <span id="email-err" class="error-text">Enter valid email address</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-gray-400">Password</label>
+                            <input type="password" id="regPass" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl outline-none text-sm" placeholder="••••••••">
+                            <span id="pass-err" class="error-text">Min. 6 characters</span>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-gray-400">Confirm Password</label>
+                            <input type="password" id="regConfirmPass" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl outline-none text-sm" placeholder="••••••••">
+                            <span id="confirm-err" class="error-text">Passwords must match</span>
+                        </div>
+                    </div>
+                    <button type="submit" id="regSubmitBtn" disabled class="w-full bg-gray-300 text-white py-4 rounded-2xl font-black uppercase tracking-widest cursor-not-allowed transition-all mt-4 flex items-center justify-center gap-2">
+                        <span id="submitText">Create User Account</span>
+                        <div id="submitLoader" class="loader hidden"></div>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="detailsModal" class="fixed inset-0 bg-black/60 z-[100] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl">
+            <div class="h-32 bg-gradient-to-r from-blue-900 to-slate-900 relative">
+                <button onclick="closeModal('detailsModal')" class="absolute top-4 right-4 text-white/50 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="px-8 pb-8 flex flex-col items-center">
+                <div class="relative -mt-16 mb-4">
+                    <img id="modalImage" class="w-32 h-32 rounded-3xl border-4 border-white shadow-xl bg-gray-200 object-cover">
+                    <div id="modalStatusBadge" class="absolute bottom-2 right-2 w-6 h-6 border-4 border-white rounded-full"></div>
+                </div>
+
+                <h3 id="modalNameDisplay" class="text-2xl font-black text-slate-900 uppercase italic"></h3>
+                <p id="modalEmail" class="text-blue-600 font-bold text-sm mb-6"></p>
+                
+                <div class="w-full space-y-3">
+                    <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex justify-between items-center">
+                        <span class="text-[10px] uppercase font-black text-gray-400 tracking-widest">Phone Number</span>
+                        <span id="modalPhone" class="text-sm font-bold text-slate-700"></span>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex justify-between items-center">
+                        <span class="text-[10px] uppercase font-black text-gray-400 tracking-widest">User ID (UID)</span>
+                        <span id="modalUID" class="text-[10px] font-mono font-bold text-slate-500 truncate ml-4"></span>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex justify-between items-center">
+                        <span class="text-[10px] uppercase font-black text-gray-400 tracking-widest">Registration Date</span>
+                        <span id="modalRegDate" class="text-sm font-bold text-slate-700"></span>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex justify-between items-center">
+                        <span class="text-[10px] uppercase font-black text-gray-400 tracking-widest">Account Status</span>
+                        <span id="modalStatusText" class="text-xs font-black uppercase italic"></span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 w-full mt-6">
+                    <button onclick="closeModal('detailsModal')" class="bg-gray-100 text-slate-700 py-3 rounded-xl font-bold hover:bg-gray-200 transition-all">Close Profile</button>
+                    <button id="editProfileBtn" onclick="openEditModal()" class="bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition-all flex items-center justify-center gap-2">
+                        <span>✏️</span> Edit Profile
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="editUserModal" class="fixed inset-0 bg-black/60 z-[110] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl">
+            <div class="p-6 border-b border-gray-100">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-black text-slate-900">Edit User Profile</h2>
+                    <button onclick="closeModal('editUserModal')" class="text-gray-400 hover:text-gray-600">✕</button>
+                </div>
+                <p class="text-gray-500 text-sm mt-1">Update user information</p>
+            </div>
+
+            <div class="p-6">
+                <form id="editForm" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Full Name</label>
+                        <input type="text" id="editName" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none" placeholder="Full Name">
+                        <span id="editNameError" class="error-text">At least 3 characters</span>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Email Address</label>
+                        <input type="email" id="editEmail" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none" placeholder="user@example.com">
+                        <span id="editEmailError" class="error-text">Enter valid email address</span>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Phone Number</label>
+                        <input type="tel" id="editPhone" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none" placeholder="09123456789">
+                        <span id="editPhoneError" class="error-text">Enter valid PH number</span>
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="submit" id="editSubmitBtn" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-blue-700 transition-all flex items-center justify-center gap-2">
+                            <span id="editSubmitText">Update Profile</span>
+                            <div id="editSubmitLoader" class="loader hidden"></div>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteConfirmModal" class="fixed inset-0 bg-black/60 z-[101] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl text-center">
+            <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">🗑️</div>
+            <h3 class="text-lg font-black text-slate-900">Delete Account?</h3>
+            <p class="text-gray-500 text-xs mt-1">Remove <span id="deleteTargetEmail" class="font-bold text-slate-800"></span>?</p>
+            <p class="text-red-500 text-[10px] font-bold mt-2">This action cannot be undone.</p>
+            <div class="grid grid-cols-2 gap-2 mt-6">
+                <button onclick="closeModal('deleteConfirmModal')" class="bg-gray-100 text-slate-700 py-2.5 rounded-lg text-sm font-bold hover:bg-gray-200 transition-colors">Cancel</button>
+                <button id="finalDeleteBtn" class="bg-red-600 text-white py-2.5 rounded-lg text-sm font-bold hover:bg-red-700 transition-colors">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed top-6 right-6 z-[200] opacity-0 flex items-center gap-2 bg-white border border-emerald-100 text-emerald-700 px-4 py-3 rounded-xl shadow-xl pointer-events-none">
+        <span class="bg-emerald-500 text-white rounded-full p-1 text-xs">✓</span>
+        <p id="toastMsg" class="text-sm font-bold">User deleted successfully!</p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getAuth, 
+            onAuthStateChanged, 
+            signOut, 
+            createUserWithEmailAndPassword,
+            updateEmail
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            onSnapshot, 
+            query, 
+            orderBy, 
+            doc, 
+            setDoc, 
+            deleteDoc, 
+            updateDoc,
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyArXdGOgHeeoX2iqegUvpg5l-eF02SUE-Y",
+            authDomain: "paf06-7d7cb.firebaseapp.com",
+            projectId: "paf06-7d7cb",
+            storageBucket: "paf06-7d7cb.firebasestorage.app",
+            messagingSenderId: "661740924808",
+            appId: "1:661740924808:web:6b00c1341f34e9eb81143d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const cloudName = "duzlklts9";
+
+        const tableBody = document.getElementById('manageTableBody');
+        const userCounter = document.getElementById('userCounter');
+        
+        let allUsers = [];
+        let currentDeleteId = null;
+        let currentEditId = null;
+        let capturedImageBlob = null;
+        let webcamStream = null;
+        let isWebcamInitialized = false;
+
+        // --- PAGINATION VARIABLES ---
+        let currentPage = 1;
+        let rowsPerPage = 15;
+        let filteredUsers = [];
+        let currentFilter = 'all';
+        let currentSort = 'date-desc';
+
+        // --- FILE UPLOAD LOGIC ---
+        const fileUpload = document.getElementById('file-upload');
+        fileUpload.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (file.size > 5 * 1024 * 1024) {
+                alert("File too large! Max 5MB");
+                return;
+            }
+            capturedImageBlob = file; 
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                photoResult.src = event.target.result;
+                video.style.display = 'none';
+                photoResult.style.display = 'block';
+                snapBtn.classList.add('hidden');
+                retakeBtn.classList.remove('hidden');
+                stopWebcam();
+                checkFormValidity();
+            };
+            reader.readAsDataURL(file);
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) window.location.href = "index.html";
+            else {
+                document.getElementById('navAdminName').innerText = user.email.split('@')[0];
+                document.getElementById('navAdminEmail').innerText = user.email;
+            }
+        });
+
+        // --- CAMERA LOGIC ---
+        const video = document.getElementById('webcam-feed');
+        const photoResult = document.getElementById('photo-result');
+        const snapBtn = document.getElementById('snap-btn');
+        const retakeBtn = document.getElementById('retake-btn');
+
+        async function initWebcam() {
+            if (isWebcamInitialized) return;
+            
+            try {
+                // Timeout after 5 seconds
+                const timeout = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error("Camera access timeout")), 5000)
+                );
+                
+                const stream = await Promise.race([
+                    navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            width: { ideal: 640 },
+                            height: { ideal: 480 },
+                            facingMode: 'user'
+                        } 
+                    }),
+                    timeout
+                ]);
+                
+                webcamStream = stream;
+                video.srcObject = webcamStream;
+                video.style.display = 'block';
+                photoResult.style.display = 'none';
+                snapBtn.classList.remove('hidden');
+                retakeBtn.classList.add('hidden');
+                isWebcamInitialized = true;
+            } catch (e) { 
+                console.log("Camera access denied or timeout.");
+                // Fallback: show message
+                document.getElementById('webcam-container').innerHTML = 
+                    '<div class="text-white text-center p-4">Camera not available. Please upload a photo instead.</div>';
+            }
+        }
+
+        function stopWebcam() { 
+            if (webcamStream) {
+                webcamStream.getTracks().forEach(t => t.stop());
+                webcamStream = null;
+                isWebcamInitialized = false;
+            }
+        }
+
+        snapBtn.onclick = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 640; 
+            canvas.height = 480;
+            const ctx = canvas.getContext('2d');
+            ctx.translate(canvas.width, 0); 
+            ctx.scale(-1, 1);
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob((blob) => {
+                capturedImageBlob = blob;
+                photoResult.src = URL.createObjectURL(blob);
+                video.style.display = 'none';
+                photoResult.style.display = 'block';
+                snapBtn.classList.add('hidden');
+                retakeBtn.classList.remove('hidden');
+                checkFormValidity();
+            }, 'image/jpeg', 0.8);
+        };
+
+        retakeBtn.onclick = () => {
+            video.style.display = 'block'; 
+            photoResult.style.display = 'none';
+            snapBtn.classList.remove('hidden'); 
+            retakeBtn.classList.add('hidden');
+            capturedImageBlob = null; 
+            checkFormValidity();
+            if(!webcamStream || !webcamStream.active) initWebcam();
+        };
+
+        // --- LIVE VALIDATION LOGIC ---
+        const regForm = document.getElementById('registerForm');
+        const submitBtn = document.getElementById('regSubmitBtn');
+        const submitText = document.getElementById('submitText');
+        const submitLoader = document.getElementById('submitLoader');
+        
+        const fields = {
+            name: { el: document.getElementById('regName'), err: document.getElementById('name-err'), validate: (v) => v.length >= 3 },
+            phone: { el: document.getElementById('regPhone'), err: document.getElementById('phone-err'), validate: (v) => /^(09|\+639)\d{9}$/.test(v) },
+            email: { el: document.getElementById('regEmail'), err: document.getElementById('email-err'), validate: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) },
+            pass: { el: document.getElementById('regPass'), err: document.getElementById('pass-err'), validate: (v) => v.length >= 6 },
+            confirm: { el: document.getElementById('regConfirmPass'), err: document.getElementById('confirm-err'), validate: (v) => v === document.getElementById('regPass').value && v !== "" }
+        };
+
+        function checkFormValidity() {
+            let isAllValid = true;
+            Object.values(fields).forEach(f => {
+                const valid = f.validate(f.el.value);
+                if (!valid && f.el.value !== "") { 
+                    f.el.classList.add('invalid'); 
+                    f.err.style.display = 'block'; 
+                } else { 
+                    f.el.classList.remove('invalid'); 
+                    f.err.style.display = 'none'; 
+                }
+                if (!valid) isAllValid = false;
+            });
+
+            if (isAllValid && capturedImageBlob) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('bg-gray-300', 'cursor-not-allowed');
+                submitBtn.classList.add('bg-blue-600', 'hover:bg-blue-700', 'cursor-pointer');
+                document.getElementById('photo-error').style.display = 'none';
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.classList.add('bg-gray-300', 'cursor-not-allowed');
+                submitBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'cursor-pointer');
+                if (!capturedImageBlob) document.getElementById('photo-error').style.display = 'block';
+            }
+        }
+
+        Object.values(fields).forEach(f => f.el.addEventListener('input', checkFormValidity));
+
+        // --- CLOUDINARY UPLOAD FUNCTION ---
+        async function uploadToCloudinary(blob, uid) {
+            const formData = new FormData();
+            formData.append('file', blob); 
+            formData.append('upload_preset', 'ml_default'); 
+            formData.append('public_id', uid);
+            formData.append('tags', 'user_profile');
+            
+            try {
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { 
+                    method: 'POST', 
+                    body: formData 
+                });
+                
+                if (!response.ok) {
+                    const error = await response.text();
+                    throw new Error(`Cloudinary upload failed: ${error}`);
+                }
+                
+                const data = await response.json();
+                console.log('Cloudinary upload successful:', data);
+                return data.secure_url;
+            } catch (error) {
+                console.error('Cloudinary upload error:', error);
+                throw error;
+            }
+        }
+
+        // --- FIREBASE LISTENER ---
+        onSnapshot(query(collection(db, "users"), orderBy("timestamp", "desc")), (snapshot) => {
+            allUsers = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            updateFilterCounts();
+            applyFilter(currentFilter);
+        });
+
+        // --- FILTER FUNCTIONS ---
+        function updateFilterCounts() {
+            const onlineCount = allUsers.filter(u => u.status === 'online').length;
+            const offlineCount = allUsers.filter(u => u.status === 'offline').length;
+            
+            document.getElementById('filterAllCount').textContent = allUsers.length;
+            document.getElementById('filterOnlineCount').textContent = onlineCount;
+            document.getElementById('filterOfflineCount').textContent = offlineCount;
+        }
+
+        window.applyFilter = (filterType) => {
+            currentFilter = filterType;
+            document.querySelectorAll('#filterDropdown button').forEach(btn => {
+                btn.classList.remove('bg-blue-50', 'text-blue-600');
+            });
+            
+            // Highlight selected filter
+            if (filterType === 'all') {
+                document.querySelector('#filterDropdown button:nth-child(2)').classList.add('bg-blue-50', 'text-blue-600');
+                filteredUsers = [...allUsers];
+            } else if (filterType === 'online') {
+                document.querySelector('#filterDropdown button:nth-child(3)').classList.add('bg-blue-50', 'text-blue-600');
+                filteredUsers = allUsers.filter(user => user.status === 'online');
+            } else if (filterType === 'offline') {
+                document.querySelector('#filterDropdown button:nth-child(4)').classList.add('bg-blue-50', 'text-blue-600');
+                filteredUsers = allUsers.filter(user => user.status === 'offline');
+            }
+            
+            applySort(currentSort);
+        }
+
+        window.applySort = (sortType) => {
+            currentSort = sortType;
+            document.querySelectorAll('#sortDropdown button').forEach(btn => {
+                btn.classList.remove('bg-blue-50', 'text-blue-600');
+            });
+            
+            // Highlight selected sort
+            if (sortType === 'name-asc') {
+                document.querySelector('#sortDropdown button:nth-child(2)').classList.add('bg-blue-50', 'text-blue-600');
+                filteredUsers.sort((a, b) => (a.fullName || '').localeCompare(b.fullName || ''));
+            } else if (sortType === 'name-desc') {
+                document.querySelector('#sortDropdown button:nth-child(3)').classList.add('bg-blue-50', 'text-blue-600');
+                filteredUsers.sort((a, b) => (b.fullName || '').localeCompare(a.fullName || ''));
+            } else if (sortType === 'date-desc') {
+                document.querySelector('#sortDropdown button:nth-child(4)').classList.add('bg-blue-50', 'text-blue-600');
+                filteredUsers.sort((a, b) => {
+                    const dateA = a.timestamp ? a.timestamp.toDate() : new Date(0);
+                    const dateB = b.timestamp ? b.timestamp.toDate() : new Date(0);
+                    return dateB - dateA;
+                });
+            }
+            
+            currentPage = 1; // Reset to first page when sorting
+            renderTableWithPagination();
+            closeAllDropdowns();
+        }
+
+        // --- PAGINATION FUNCTIONS ---
+        function renderTableWithPagination() {
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+            
+            renderTable(paginatedUsers);
+            updatePaginationControls();
+        }
+
+        function updatePaginationControls() {
+            const totalUsers = filteredUsers.length;
+            const totalPages = Math.ceil(totalUsers / rowsPerPage);
+            
+            // Show/hide pagination
+            const paginationControls = document.getElementById('paginationControls');
+            if (totalUsers > rowsPerPage) {
+                paginationControls.classList.remove('hidden');
+            } else {
+                paginationControls.classList.add('hidden');
+            }
+            
+            // Update counters
+            document.getElementById('paginationStart').textContent = Math.min((currentPage - 1) * rowsPerPage + 1, totalUsers);
+            document.getElementById('paginationEnd').textContent = Math.min(currentPage * rowsPerPage, totalUsers);
+            document.getElementById('paginationTotal').textContent = totalUsers;
+            
+            // Update page buttons
+            updatePageButtons(totalPages);
+            
+            // Update prev/next buttons
+            const prevBtn = document.getElementById('prevPageBtn');
+            const nextBtn = document.getElementById('nextPageBtn');
+            
+            prevBtn.classList.toggle('disabled', currentPage === 1);
+            nextBtn.classList.toggle('disabled', currentPage === totalPages || totalPages === 0);
+        }
+
+        function updatePageButtons(totalPages) {
+            const pageNumbersContainer = document.getElementById('pageNumbers');
+            pageNumbersContainer.innerHTML = '';
+            
+            // Always show first page
+            addPageButton(1, totalPages);
+            
+            // Show ellipsis if needed
+            if (currentPage > 3) {
+                const ellipsis = document.createElement('span');
+                ellipsis.textContent = '...';
+                ellipsis.className = 'px-2 text-gray-400';
+                pageNumbersContainer.appendChild(ellipsis);
+            }
+            
+            // Show pages around current page
+            const startPage = Math.max(2, currentPage - 1);
+            const endPage = Math.min(totalPages - 1, currentPage + 1);
+            
+            for (let i = startPage; i <= endPage; i++) {
+                if (i > 1 && i < totalPages) {
+                    addPageButton(i, totalPages);
+                }
+            }
+            
+            // Show ellipsis if needed
+            if (currentPage < totalPages - 2) {
+                const ellipsis = document.createElement('span');
+                ellipsis.textContent = '...';
+                ellipsis.className = 'px-2 text-gray-400';
+                pageNumbersContainer.appendChild(ellipsis);
+            }
+            
+            // Always show last page if there is more than 1 page
+            if (totalPages > 1) {
+                addPageButton(totalPages, totalPages);
+            }
+        }
+
+        function addPageButton(pageNum, totalPages) {
+            const pageNumbersContainer = document.getElementById('pageNumbers');
+            const btn = document.createElement('button');
+            btn.className = `pagination-btn ${pageNum === currentPage ? 'active' : ''}`;
+            btn.textContent = pageNum;
+            btn.onclick = () => goToPage(pageNum);
+            pageNumbersContainer.appendChild(btn);
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            renderTableWithPagination();
+        }
+
+        window.prevPage = () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTableWithPagination();
+            }
+        }
+
+        window.nextPage = () => {
+            const totalPages = Math.ceil(filteredUsers.length / rowsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTableWithPagination();
+            }
+        }
+
+        // --- RENDER TABLE ---
+        function renderTable(users) {
+            if (users.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="8" class="px-6 py-16 text-center text-gray-400 font-bold italic">No users found</td></tr>`;
+                userCounter.innerText = `0 users registered`;
+                return;
+            }
+            
+            const rows = users.map((data) => {
+                const userId = data.id;
+                // Generate image URL with timestamp to prevent caching issues
+                const timestamp = new Date().getTime();
+                const imageUrl = `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto,w_100,h_100,c_fill/${userId}?_=${timestamp}`;
+                
+                return `
+                    <tr class="bg-white hover:bg-gray-50 border-b border-gray-100">
+                        <td class="px-6 py-4">
+                            <img src="${imageUrl}" 
+                                 onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=${userId}'" 
+                                 class="w-10 h-10 rounded-lg border object-cover">
+                        </td>
+                        <td class="px-6 py-4 font-bold text-slate-700">${data.fullName || '---'}</td>
+                        <td class="px-6 py-4 font-medium text-slate-500">${data.email}</td>
+                        <td class="px-6 py-4 font-bold text-slate-600">${data.phone || '---'}</td>
+                        <td class="px-6 py-4 font-bold ${data.status === 'online' ? 'text-emerald-500' : 'text-gray-400'}">
+                            ● ${data.status || 'offline'}
+                        </td>
+                        <td class="px-6 py-4 text-gray-500 text-[11px]">
+                            ${data.timestamp ? data.timestamp.toDate().toLocaleString('en-PH', { 
+                                month: 'short', 
+                                day: 'numeric', 
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            }) : '---'}
+                        </td>
+                        <td class="px-6 py-4 text-gray-500 text-[11px]">
+                            ${data.timestamp ? data.timestamp.toDate().toLocaleDateString('en-PH') : '---'}
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="inline-block relative">
+                                <button onclick="toggleAction(event, '${userId}')" class="p-2 hover:bg-gray-200 rounded-lg text-slate-400 font-black">⋮</button>
+                                <div id="dropdown-${userId}" class="dropdown-menu absolute right-full top-0 mr-2 w-44 bg-white shadow-2xl border rounded-2xl py-2 z-50">
+                                    <button onclick="showDetails('${userId}')" class="w-full text-left px-4 py-2 text-xs font-bold hover:bg-blue-50">👁️ See Details</button>
+                                    <button onclick="confirmDelete('${userId}', '${data.email}')" class="w-full text-left px-4 py-2 text-xs font-bold text-red-500 hover:bg-red-50">🗑️ Delete User</button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            tableBody.innerHTML = rows;
+            userCounter.innerText = `${filteredUsers.length} users registered (${users.length} on this page)`;
+        }
+
+        // --- FORM SUBMISSION ---
+        regForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            submitText.innerText = "Creating Account...";
+            submitLoader.classList.remove('hidden');
+            
+            try {
+                // CRITICAL FIX: Gumawa ng hiwalay na auth instance para hindi mag-auto-login
+                // Sa halip na gumamit ng auth instance na nakalogin ang admin,
+                // gagawa tayo ng bagong temporary auth instance
+                
+                // 1. Gumawa ng bagong app instance para sa user creation
+                const tempApp = initializeApp(firebaseConfig, "TempAuth");
+                const tempAuth = getAuth(tempApp);
+                
+                // 2. Create user in Firebase Auth using temporary auth
+                const email = fields.email.el.value;
+                const password = fields.pass.el.value;
+                
+                submitText.innerText = "Creating User...";
+                const cred = await createUserWithEmailAndPassword(tempAuth, email, password);
+                const uid = cred.user.uid;
+                
+                // 3. Immediately sign out from temporary auth
+                await signOut(tempAuth);
+                
+                // 4. Upload image to Cloudinary
+                submitText.innerText = "Uploading Image...";
+                await uploadToCloudinary(capturedImageBlob, uid);
+                
+                // 5. Save user data to Firestore
+                submitText.innerText = "Saving Data...";
+                await setDoc(doc(db, "users", uid), {
+                    fullName: fields.name.el.value, 
+                    phone: fields.phone.el.value, 
+                    email: email, 
+                    status: "offline", 
+                    timestamp: serverTimestamp(),
+                    imageUrl: `https://res.cloudinary.com/${cloudName}/image/upload/${uid}`
+                });
+                
+                // 6. Delete the temporary app instance
+                try {
+                    // Note: Firebase doesn't have a deleteApp function in v10.8.0
+                    // Just let it be, or if you want to clean up, you can set to null
+                    window.tempApp = null;
+                } catch (cleanupErr) {
+                    console.log("Cleanup warning:", cleanupErr);
+                }
+                
+                showToast("User successfully registered!");
+                closeModal('addUserModal');
+                
+                // Reset form
+                regForm.reset();
+                capturedImageBlob = null;
+                checkFormValidity();
+                
+            } catch (err) { 
+                console.error('Registration error:', err);
+                let errorMsg = err.message;
+                
+                // More user-friendly error messages
+                if (errorMsg.includes("email-already-in-use")) {
+                    errorMsg = "This email is already registered.";
+                } else if (errorMsg.includes("weak-password")) {
+                    errorMsg = "Password is too weak. Please use a stronger password.";
+                } else if (errorMsg.includes("invalid-email")) {
+                    errorMsg = "Invalid email format.";
+                }
+                
+                alert(`Error: ${errorMsg}`); 
+            } finally {
+                // Reset button state
+                submitBtn.disabled = false;
+                submitText.innerText = "Create User Account";
+                submitLoader.classList.add('hidden');
+            }
+        });
+
+        // --- EDIT PROFILE FUNCTIONS ---
+        window.openEditModal = function() {
+            const user = allUsers.find(u => u.id === currentEditId);
+            if (!user) return;
+            
+            // Populate edit form with current data
+            document.getElementById('editName').value = user.fullName || '';
+            document.getElementById('editEmail').value = user.email || '';
+            document.getElementById('editPhone').value = user.phone || '';
+            
+            // Reset error states
+            document.getElementById('editNameError').style.display = 'none';
+            document.getElementById('editEmailError').style.display = 'none';
+            document.getElementById('editPhoneError').style.display = 'none';
+            
+            closeModal('detailsModal');
+            openModal('editUserModal');
+        };
+
+        // Edit form validation
+        const editForm = document.getElementById('editForm');
+        const editSubmitBtn = document.getElementById('editSubmitBtn');
+        const editSubmitText = document.getElementById('editSubmitText');
+        const editSubmitLoader = document.getElementById('editSubmitLoader');
+
+        editForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Validate inputs
+            const name = document.getElementById('editName').value.trim();
+            const email = document.getElementById('editEmail').value.trim();
+            const phone = document.getElementById('editPhone').value.trim();
+            
+            let isValid = true;
+            
+            // Name validation
+            if (name.length < 3) {
+                document.getElementById('editNameError').style.display = 'block';
+                document.getElementById('editName').classList.add('invalid');
+                isValid = false;
+            } else {
+                document.getElementById('editNameError').style.display = 'none';
+                document.getElementById('editName').classList.remove('invalid');
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                document.getElementById('editEmailError').style.display = 'block';
+                document.getElementById('editEmail').classList.add('invalid');
+                isValid = false;
+            } else {
+                document.getElementById('editEmailError').style.display = 'none';
+                document.getElementById('editEmail').classList.remove('invalid');
+            }
+            
+            // Phone validation (optional)
+            const phoneRegex = /^(09|\+639)\d{9}$/;
+            if (phone && !phoneRegex.test(phone)) {
+                document.getElementById('editPhoneError').style.display = 'block';
+                document.getElementById('editPhone').classList.add('invalid');
+                isValid = false;
+            } else {
+                document.getElementById('editPhoneError').style.display = 'none';
+                document.getElementById('editPhone').classList.remove('invalid');
+            }
+            
+            if (!isValid) return;
+            
+            // Show loading state
+            editSubmitBtn.disabled = true;
+            editSubmitText.innerText = "Updating...";
+            editSubmitLoader.classList.remove('hidden');
+            
+            try {
+                const user = allUsers.find(u => u.id === currentEditId);
+                if (!user) throw new Error("User not found");
+                
+                // Update Firestore document
+                await updateDoc(doc(db, "users", currentEditId), {
+                    fullName: name,
+                    phone: phone,
+                    email: email
+                });
+                
+                showToast("Profile updated successfully!");
+                closeModal('editUserModal');
+                
+            } catch (error) {
+                console.error('Update error:', error);
+                showToast("Failed to update profile", true);
+            } finally {
+                // Reset button state
+                editSubmitBtn.disabled = false;
+                editSubmitText.innerText = "Update Profile";
+                editSubmitLoader.classList.add('hidden');
+            }
+        });
+
+        // --- UTILITY FUNCTIONS ---
+        window.openAddModal = () => { 
+            capturedImageBlob = null; 
+            regForm.reset(); 
+            closeModal('detailsModal'); 
+            openModal('addUserModal'); 
+            setTimeout(() => initWebcam(), 100); // Small delay for modal to open
+            checkFormValidity(); 
+        };
+        
+        window.openModal = (id) => document.getElementById(id).classList.add('show');
+        window.closeModal = (id) => { 
+            document.getElementById(id).classList.remove('show'); 
+            if (id === 'addUserModal') {
+                stopWebcam();
+                // Reset form
+                regForm.reset();
+                capturedImageBlob = null;
+                video.style.display = 'block';
+                photoResult.style.display = 'none';
+                snapBtn.classList.remove('hidden');
+                retakeBtn.classList.add('hidden');
+                document.getElementById('file-upload').value = '';
+                isWebcamInitialized = false;
+            }
+        };
+        
+        window.toggleAction = (e, id) => { 
+            e.stopPropagation(); 
+            document.querySelectorAll('.dropdown-menu').forEach(el => {
+                if (el.id !== `dropdown-${id}`) el.classList.remove('show');
+            }); 
+            document.getElementById(`dropdown-${id}`).classList.toggle('show'); 
+        };
+        
+        function closeAllDropdowns() {
+            document.querySelectorAll('.dropdown-menu').forEach(el => {
+                el.classList.remove('show');
+            });
+        }
+        
+        window.showDetails = (id) => {
+            const user = allUsers.find(u => u.id === id);
+            if (!user) return;
+            
+            currentEditId = id;
+            
+            const isOnline = user.status === 'online';
+            const timestamp = new Date().getTime();
+            document.getElementById('modalImage').src = `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto,w_300,h_300,c_fill/${id}?_=${timestamp}`;
+            
+            const badge = document.getElementById('modalStatusBadge');
+            badge.className = `absolute bottom-2 right-2 w-6 h-6 border-4 border-white rounded-full ${isOnline ? 'bg-emerald-500 shadow-[0_0_10px_#10b981]' : 'bg-gray-400'}`;
+            
+            document.getElementById('modalNameDisplay').innerText = user.fullName || 'No Name Found';
+            document.getElementById('modalEmail').innerText = user.email;
+            document.getElementById('modalPhone').innerText = user.phone || 'N/A';
+            document.getElementById('modalUID').innerText = user.id;
+            
+            const regDate = user.timestamp ? user.timestamp.toDate().toLocaleDateString('en-PH', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            }) : 'No Date Recorded';
+            document.getElementById('modalRegDate').innerText = regDate;
+            
+            const statusText = document.getElementById('modalStatusText');
+            statusText.innerText = user.status || 'offline';
+            statusText.className = `text-xs font-black uppercase italic ${isOnline ? 'text-emerald-500' : 'text-gray-400'}`;
+            
+            openModal('detailsModal');
+        };
+
+        window.confirmDelete = (id, email) => { 
+            currentDeleteId = id; 
+            document.getElementById('deleteTargetEmail').innerText = email; 
+            openModal('deleteConfirmModal'); 
+        };
+        
+        document.getElementById('finalDeleteBtn').onclick = async () => { 
+            try {
+                await deleteDoc(doc(db, "users", currentDeleteId)); 
+                closeModal('deleteConfirmModal'); 
+                showToast("User deleted successfully!"); 
+            } catch (error) {
+                console.error('Delete error:', error);
+                showToast("Failed to delete user", true);
+            }
+        };
+        
+        function showToast(msg, isError = false) { 
+            const t = document.getElementById('toast'); 
+            const icon = t.querySelector('span');
+            const text = document.getElementById('toastMsg');
+            
+            if (isError) {
+                t.className = "fixed top-6 right-6 z-[200] opacity-0 flex items-center gap-2 bg-white border border-red-100 text-red-700 px-4 py-3 rounded-xl shadow-xl pointer-events-none";
+                icon.className = "bg-red-500 text-white rounded-full p-1 text-xs";
+                icon.textContent = "✕";
+            } else {
+                t.className = "fixed top-6 right-6 z-[200] opacity-0 flex items-center gap-2 bg-white border border-emerald-100 text-emerald-700 px-4 py-3 rounded-xl shadow-xl pointer-events-none";
+                icon.className = "bg-emerald-500 text-white rounded-full p-1 text-xs";
+                icon.textContent = "✓";
+            }
+            
+            text.innerText = msg; 
+            t.classList.add('show'); 
+            setTimeout(() => t.classList.remove('show'), 3000); 
+        }
+
+        // --- EVENT LISTENERS ---
+        window.onclick = (e) => { 
+            // Close dropdowns when clicking outside
+            if (!e.target.closest('.dropdown-menu') && !e.target.closest('#profileBtn') && 
+                !e.target.closest('#filterBtn') && !e.target.closest('#sortBtn')) {
+                closeAllDropdowns();
+                document.getElementById('profileDropdown').classList.remove('show');
+            }
+            
+            // Close modals when clicking on overlay
+            if (e.target.classList.contains('fixed')) {
+                closeModal(e.target.id);
+            }
+        };
+        
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            signOut(auth).then(() => window.location.href = "index.html");
+        });
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            if (!searchTerm) {
+                applyFilter(currentFilter);
+                return;
+            }
+            
+            filteredUsers = allUsers.filter(user => 
+                user.email.toLowerCase().includes(searchTerm) ||
+                (user.fullName && user.fullName.toLowerCase().includes(searchTerm)) ||
+                (user.phone && user.phone.includes(searchTerm))
+            );
+            
+            currentPage = 1; // Reset to first page when searching
+            renderTableWithPagination();
+        });
+
+        // Profile dropdown toggle
+        document.getElementById('profileBtn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('profileDropdown').classList.toggle('show');
+        });
+
+        // Filter dropdown toggle
+        document.getElementById('filterBtn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeAllDropdowns();
+            document.getElementById('filterDropdown').classList.toggle('show');
+        });
+
+        // Sort dropdown toggle
+        document.getElementById('sortBtn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeAllDropdowns();
+            document.getElementById('sortDropdown').classList.toggle('show');
+        });
+
+        // Pagination event listeners
+        document.getElementById('prevPageBtn').addEventListener('click', () => prevPage());
+        document.getElementById('nextPageBtn').addEventListener('click', () => nextPage());
+        
+        document.getElementById('rowsPerPage').addEventListener('change', (e) => {
+            rowsPerPage = parseInt(e.target.value);
+            currentPage = 1; // Reset to first page when changing rows per page
+            renderTableWithPagination();
+        });
+
+        // Initialize with default filter and sort
+        applyFilter('all');
+        applySort('date-desc');
+
+    </script>
+</body>
+</html>
