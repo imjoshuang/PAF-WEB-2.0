@@ -393,8 +393,9 @@
             serverTimestamp 
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+// Ito ang kukuha ng values galing sa Netlify Environment Variables na sinet natin kanina
         const firebaseConfig = {
-            apiKey: "AIzaSyArXdGOgHeeoX2iqegUvpg5l-eF02SUE-Y",
+            apiKey: localStorage.getItem('FIREBASE_API_KEY') || "AIzaSyArXdGOgHeeoX2iqegUvpg5l-eF02SUE-Y",
             authDomain: "paf06-7d7cb.firebaseapp.com",
             projectId: "paf06-7d7cb",
             storageBucket: "paf06-7d7cb.firebasestorage.app",
