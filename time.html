@@ -54,6 +54,172 @@
             object-fit: cover;
             z-index: 20;
         }
+
+        .badge-late {
+            background-color: #fee2e2;
+            color: #dc2626;
+            padding: 4px 8px;
+            border-radius: 9999px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .badge-ontime {
+            background-color: #dcfce7;
+            color: #16a34a;
+            padding: 4px 8px;
+            border-radius: 9999px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .badge-early {
+            background-color: #dbeafe;
+            color: #2563eb;
+            padding: 4px 8px;
+            border-radius: 9999px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .badge-night {
+            background-color: #e0e7ff;
+            color: #4f46e5;
+            padding: 4px 8px;
+            border-radius: 9999px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .badge-duty {
+            background-color: #f1f5f9;
+            color: #475569;
+            padding: 4px 8px;
+            border-radius: 9999px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        /* Timeline Bridge Style */
+        .time-bridge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+        
+        .bridge-line {
+            flex-grow: 1;
+            height: 2px;
+            background-color: #f1f5f9;
+            position: relative;
+            min-width: 80px;
+        }
+        
+        .bridge-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #cbd5e1;
+            border-radius: 999px;
+            position: absolute;
+            top: -2px;
+        }
+        
+        .duration-label {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 9px;
+            color: #94a3b8;
+            font-weight: 600;
+            white-space: nowrap;
+            background: white;
+            padding: 0 4px;
+        }
+        
+        /* Avatar Container */
+        .avatar-container {
+            position: relative;
+            width: 44px;
+            height: 44px;
+        }
+        
+        .avatar-container img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        
+        .avatar-container:hover img {
+            transform: scale(1.1);
+            border-color: #3b82f6;
+        }
+
+        /* Employee card styles */
+        .employee-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .employee-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .employee-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .employee-name {
+            font-weight: 700;
+            font-size: 14px;
+            color: #1e293b;
+        }
+        
+        .employee-id {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 600;
+            margin-top: 2px;
+            letter-spacing: 0.3px;
+        }
+
+        /* Compact modal for register */
+        #actionModal.register-mode .video-wrapper {
+            max-width: 200px;
+        }
+        
+        #actionModal.register-mode #video-wrapper {
+            max-width: 200px;
+        }
+        
+        #actionModal.register-mode .space-y-4 {
+            gap: 0.5rem;
+        }
+        
+        #actionModal.register-mode input {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        /* Admin list item hover effect */
+        .admin-item {
+            transition: all 0.2s;
+        }
+        .admin-item:hover {
+            background-color: #eff6ff;
+            border-color: #bfdbfe;
+        }
     </style>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800">
@@ -94,86 +260,305 @@
         </div>
     </nav>
 
+    <!-- Action Modal (Time-in/Time-out/Register) -->
     <div id="actionModal" class="modal fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
-        <div class="bg-white w-full max-w-[420px] rounded-3xl overflow-hidden shadow-2xl transition-all">
-            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                <h2 id="modalTitle" class="text-md font-black text-slate-900 uppercase tracking-tight">Action</h2>
+        <div class="bg-white w-full max-w-[380px] rounded-3xl overflow-hidden shadow-2xl transition-all">
+            <div class="px-5 py-3 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h2 id="modalTitle" class="text-sm font-black text-slate-900 uppercase tracking-tight">Action</h2>
                 <button id="closeModalBtn" class="text-gray-400 hover:text-red-500 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
             
-            <form id="actionForm" class="p-6 space-y-4">
-                <div id="aiStatus" class="text-[10px] font-bold text-center py-1 rounded-full bg-gray-100 text-gray-500 italic">Initializing Face Scanner...</div>
+            <form id="actionForm" class="p-4 space-y-3">
+                <div id="aiStatus" class="text-[9px] font-bold text-center py-1 rounded-full bg-gray-100 text-gray-500 italic">Initializing Face Scanner...</div>
 
-                <div class="relative w-full aspect-square max-w-[280px] mx-auto bg-black rounded-2xl overflow-hidden shadow-inner border-2 border-blue-50" id="video-wrapper">
+                <div class="relative w-full aspect-square max-w-[240px] mx-auto bg-black rounded-2xl overflow-hidden shadow-inner border-2 border-blue-50" id="video-wrapper">
                     <div id="scan-line" class="scanner-line hidden"></div>
                     <video id="video" autoplay playsinline muted class="w-full h-full object-cover"></video>
                     <canvas id="face-canvas"></canvas>
                     <canvas id="snapshot-canvas" class="hidden"></canvas>
                 </div>
                 
-                <button type="button" id="snapBtn" class="w-full bg-slate-800 text-white py-2.5 rounded-xl font-bold text-xs hover:bg-slate-900 transition-all flex items-center justify-center gap-2">
+                <button type="button" id="snapBtn" class="w-full bg-slate-800 text-white py-2 rounded-xl font-bold text-[10px] hover:bg-slate-900 transition-all flex items-center justify-center gap-2">
                     📸 Capture Photo (Manual)
                 </button>
 
-                <div class="space-y-3">
+                <div class="space-y-2">
                     <div id="idFieldContainer">
-                        <label class="text-[10px] font-bold uppercase text-gray-400 ml-1">Admin ID (Identity Verified)</label>
+                        <label class="text-[9px] font-bold uppercase text-gray-400 ml-1">Admin ID (Identity Verified)</label>
                         <input type="text" id="inputID" readonly placeholder="Scanning..." 
-                            class="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-100 outline-none text-sm font-bold text-blue-600">
+                            class="w-full px-3 py-2 rounded-xl border border-gray-100 bg-gray-100 outline-none text-xs font-bold text-blue-600">
                     </div>
                     <div>
-                        <label class="text-[10px] font-bold uppercase text-gray-400 ml-1">Full Name</label>
+                        <label class="text-[9px] font-bold uppercase text-gray-400 ml-1">Full Name</label>
                         <input type="text" id="inputName" required placeholder="Enter full name..." 
-                            class="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500/20 text-sm">
+                            class="w-full px-3 py-2 rounded-xl border border-gray-100 bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500/20 text-xs">
                     </div>
                     <div id="emailFieldContainer">
-                        <label class="text-[10px] font-bold uppercase text-gray-400 ml-1">Email Address</label>
+                        <label class="text-[9px] font-bold uppercase text-gray-400 ml-1">Email Address</label>
                         <input type="email" id="inputEmail" placeholder="juan@gmail.com" 
-                            class="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500/20 text-sm">
+                            class="w-full px-3 py-2 rounded-xl border border-gray-100 bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500/20 text-xs">
+                    </div>
+                    
+                    <!-- Duty Shift Selection with Custom Option -->
+                    <div id="shiftFieldContainer" class="hidden space-y-2">
+                        <div>
+                            <label class="text-[9px] font-bold uppercase text-gray-400 ml-1">Duty Shift</label>
+                            <select id="inputShift" onchange="toggleCustomShift()" class="w-full px-3 py-2 rounded-xl border border-gray-100 bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500/20 text-xs">
+                                <option value="morning">Morning Shift (8:00 AM - 5:00 PM)</option>
+                                <option value="night">Night Shift (9:00 PM - 6:00 AM)</option>
+                                <option value="flexible">Flexible Schedule</option>
+                                <option value="custom">✨ Custom Shift</option>
+                            </select>
+                        </div>
+
+                        <div id="customShiftInputs" class="hidden grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[8px] font-bold uppercase text-blue-400 ml-1">Start</label>
+                                <input type="time" id="customStart" class="w-full px-2 py-1.5 rounded-xl border border-blue-100 bg-blue-50/30 text-[10px]">
+                            </div>
+                            <div>
+                                <label class="text-[8px] font-bold uppercase text-blue-400 ml-1">End</label>
+                                <input type="time" id="customEnd" class="w-full px-2 py-1.5 rounded-xl border border-blue-100 bg-blue-50/30 text-[10px]">
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <button type="submit" id="submitBtn" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
+                <button type="submit" id="submitBtn" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold text-xs hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
                     Confirm Action
                 </button>
             </form>
         </div>
     </div>
 
-    <main class="max-w-[1400px] mx-auto p-8 transition-all space-y-6">
-        <div class="flex items-center justify-between bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-            <h1 class="text-xl font-black text-slate-800">Attendance Log</h1>
-            <div class="flex items-center gap-3">
-                <button onclick="openModal('time-in')" class="bg-emerald-600 text-white px-5 py-2.5 rounded-xl text-xs uppercase font-bold tracking-wider hover:bg-emerald-700 transition-all shadow-md shadow-emerald-100 flex items-center gap-2">
-                    🕒 Time-in
+    <!-- Edit Admin Modal -->
+    <div id="editAdminModal" class="modal fixed inset-0 bg-black/60 backdrop-blur-sm z-[115] hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-[420px] rounded-3xl overflow-hidden shadow-2xl">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-blue-50">
+                <h2 class="text-md font-black text-blue-900 uppercase tracking-tight">Update Admin Profile</h2>
+                <button onclick="closeEditModal()" class="text-gray-400 hover:text-red-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
-                <button onclick="openModal('time-out')" class="bg-red-600 text-white px-5 py-2.5 rounded-xl text-xs uppercase font-bold tracking-wider hover:bg-red-700 transition-all shadow-md shadow-red-100 flex items-center gap-2">
-                    🕒 Time-out
+            </div>
+            
+            <form id="editAdminForm" class="p-6 space-y-4">
+                <input type="hidden" id="editAdminId">
+                
+                <!-- Profile Picture Preview -->
+                <div class="flex flex-col items-center mb-4">
+                    <div class="relative">
+                        <img id="editProfilePreview" src="" alt="Profile" class="w-24 h-24 rounded-full object-cover border-4 border-blue-100 shadow-lg">
+                        <button type="button" onclick="document.getElementById('editProfileUpload').click()" class="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 shadow-md">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        </button>
+                    </div>
+                    <input type="file" id="editProfileUpload" accept="image/*" class="hidden" onchange="previewEditImage(event)">
+                    <p class="text-[10px] text-gray-400 mt-2">Click to change profile picture</p>
+                </div>
+                
+                <div>
+                    <label class="text-[10px] font-bold uppercase text-gray-400 ml-1">Full Name</label>
+                    <input type="text" id="editName" required class="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 text-sm font-bold">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase text-gray-400 ml-1">Email Address</label>
+                    <input type="email" id="editEmail" required class="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 text-sm font-bold">
+                </div>
+                
+                <div>
+                    <label class="text-[10px] font-bold uppercase text-gray-400 ml-1">Duty Shift</label>
+                    <select id="editShift" onchange="toggleEditCustomShift()" class="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 text-sm font-bold">
+                        <option value="morning">Morning Shift (8:00 AM - 5:00 PM)</option>
+                        <option value="night">Night Shift (9:00 PM - 6:00 AM)</option>
+                        <option value="flexible">Flexible Schedule</option>
+                        <option value="custom">✨ Custom Shift Schedule</option>
+                    </select>
+                </div>
+
+                <div id="editCustomShiftInputs" class="hidden grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-[10px] font-bold uppercase text-blue-400 ml-1">Start Time</label>
+                        <input type="time" id="editCustomStart" class="w-full px-4 py-2 rounded-xl border border-blue-100 bg-blue-50/30 text-xs">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase text-blue-400 ml-1">End Time</label>
+                        <input type="time" id="editCustomEnd" class="w-full px-4 py-2 rounded-xl border border-blue-100 bg-blue-50/30 text-xs">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-sm hover:bg-blue-700 shadow-lg shadow-blue-100">
+                    Save Changes
                 </button>
-                <div class="h-6 w-[1px] bg-gray-200 mx-1"></div>
-                <button onclick="openModal('register')" class="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-xs uppercase font-bold tracking-wider hover:bg-blue-700 transition-all shadow-md shadow-blue-100 flex items-center gap-2">
-                    ➕ Register Admin
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin List Modal (CRUD with Analytics) -->
+    <div id="adminListModal" class="modal fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-[800px] rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <div>
+                    <h2 class="text-xl font-black text-slate-900 uppercase tracking-tight">Admin Registry</h2>
+                    <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">System Analytics & Access Management</p>
+                </div>
+                <button onclick="closeAdminListModal()" class="text-gray-400 hover:text-red-500 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
-                <div class="h-6 w-[1px] bg-gray-200 mx-1"></div>
-                <button onclick="window.exportToExcel()" class="bg-emerald-100 text-emerald-700 px-5 py-2.5 rounded-xl text-xs uppercase font-bold tracking-wider hover:bg-emerald-200 transition-all flex items-center gap-2">
-                    📊 Excel
+            </div>
+
+            <div class="p-6 grid grid-cols-2 md:grid-cols-4 gap-4 bg-slate-50/50 border-b border-gray-100">
+                <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase">Total Admins</p>
+                    <h3 id="statTotalAdmins" class="text-2xl font-black text-slate-800">0</h3>
+                    <p class="text-[9px] text-emerald-500 font-bold">● Active Personnel</p>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase">On Duty</p>
+                    <h3 id="statOnDuty" class="text-2xl font-black text-blue-600">0</h3>
+                    <p class="text-[9px] text-blue-400 font-bold">● Currently Clocked-in</p>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase">Late Today</p>
+                    <h3 id="statLateToday" class="text-2xl font-black text-orange-500">0</h3>
+                    <p class="text-[9px] text-orange-400 font-bold">● Attention required</p>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase">Shifts</p>
+                    <h3 class="text-2xl font-black text-slate-800">2</h3>
+                    <p class="text-[9px] text-slate-400 font-bold">● Morning / Night</p>
+                </div>
+            </div>
+
+            <div class="p-4 border-b border-gray-50 bg-white">
+                <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2">🔍</span>
+                    <input type="text" id="adminSearch" onkeyup="filterAdminList()" placeholder="Search registered admin by name or ID..." 
+                        class="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500/20">
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-4 space-y-2 bg-white" id="adminListContainer">
+                <div class="p-8 text-center text-gray-400 italic text-xs">Loading admins...</div>
+            </div>
+
+            <div class="p-4 bg-gray-50 border-t border-gray-100 flex justify-end">
+                <button onclick="closeAdminListModal()" class="px-8 py-2.5 bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-slate-900 shadow-lg shadow-slate-200">Close Registry</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="exportModal" class="modal fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-[450px] rounded-3xl overflow-hidden shadow-2xl">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                <div>
+                    <h2 class="text-lg font-black text-slate-900">Download Attendance Report</h2>
+                    <p class="text-xs text-gray-400 font-medium">Export data in your preferred format</p>
+                </div>
+                <button onclick="closeExportModal()" class="text-gray-400 hover:text-red-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
-                <button onclick="window.exportToPDF()" class="bg-red-100 text-red-700 px-5 py-2.5 rounded-xl text-xs uppercase font-bold tracking-wider hover:bg-red-200 transition-all flex items-center gap-2">
-                    📕 PDF
+            </div>
+
+            <div class="p-6 space-y-6">
+                <div>
+                    <label class="text-[10px] font-bold uppercase text-gray-400 block mb-3">Format</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="setExportFormat('csv')" id="btnFormatCSV" class="border-2 border-blue-500 bg-blue-50 p-4 rounded-2xl flex flex-col items-center gap-2 transition-all">
+                            <span class="text-xl">📄</span>
+                            <span class="font-bold text-sm text-blue-900">CSV</span>
+                            <span class="text-[10px] text-blue-400">Excel/Spreadsheet</span>
+                        </button>
+                        <button onclick="setExportFormat('pdf')" id="btnFormatPDF" class="border-2 border-transparent bg-gray-50 p-4 rounded-2xl flex flex-col items-center gap-2 hover:bg-gray-100 transition-all">
+                            <span class="text-xl">📕</span>
+                            <span class="font-bold text-sm text-gray-600">PDF</span>
+                            <span class="text-[10px] text-gray-400">Printable Document</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] font-bold uppercase text-gray-400 ml-1">From</label>
+                        <input type="date" id="exportFromDate" class="w-full px-4 py-2.5 rounded-xl border border-gray-100 bg-gray-50 text-sm">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase text-gray-400 ml-1">To</label>
+                        <input type="date" id="exportToDate" class="w-full px-4 py-2.5 rounded-xl border border-gray-100 bg-gray-50 text-sm">
+                    </div>
+                </div>
+
+                <button onclick="processExport()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold text-sm hover:bg-blue-700 shadow-lg shadow-blue-100 flex items-center justify-center gap-2">
+                    📊 Generate & Download Report
                 </button>
             </div>
         </div>
+    </div>
 
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    <!-- Main Content with Updated UI -->
+    <main class="max-w-[1400px] mx-auto p-8 space-y-6">
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <h1 class="text-2xl font-black text-slate-800 tracking-tight">Attendance</h1>
+                    <div class="h-8 w-[1px] bg-gray-200 mx-2"></div>
+                    <div class="flex items-center bg-gray-50 border border-gray-100 rounded-xl p-1">
+                        <button onclick="changeDay(-1)" class="p-2 hover:bg-white hover:shadow-sm rounded-lg transition-all text-slate-400">❮</button>
+                        <span id="currentDateDisplay" class="px-4 text-sm font-bold text-slate-700 min-w-[180px] text-center">Monday, 15 October</span>
+                        <button onclick="changeDay(1)" class="p-2 hover:bg-white hover:shadow-sm rounded-lg transition-all text-slate-400">❯</button>
+                    </div>
+                </div>
+                
+                <div class="flex flex-wrap items-center gap-3">
+                    <button onclick="openModal('time-in')" class="bg-emerald-600 text-white px-5 py-2.5 rounded-xl text-xs uppercase font-bold hover:bg-emerald-700 transition-all flex items-center gap-2">
+                        🕒 Time-in
+                    </button>
+                    <button onclick="openModal('time-out')" class="bg-red-600 text-white px-5 py-2.5 rounded-xl text-xs uppercase font-bold hover:bg-red-700 transition-all flex items-center gap-2">
+                        🕒 Time-out
+                    </button>
+                    <div class="h-8 w-[1px] bg-gray-200 mx-1"></div>
+                    <button onclick="openModal('register')" class="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-xs uppercase font-bold hover:bg-blue-700 transition-all flex items-center gap-2">
+                        ➕ Register
+                    </button>
+                    <div class="h-8 w-[1px] bg-gray-200 mx-1"></div>
+                    <button onclick="openAdminListModal()" class="bg-slate-100 text-slate-600 px-5 py-2.5 rounded-xl text-xs uppercase font-bold tracking-wider hover:bg-slate-200 transition-all flex items-center gap-2">
+                        👥 Manage Admins
+                    </button>
+                    <div class="h-8 w-[1px] bg-gray-200 mx-1"></div>
+                    <button onclick="openExportModal()" class="bg-slate-800 text-white px-5 py-2.5 rounded-xl text-xs uppercase font-bold hover:bg-slate-900 transition-all flex items-center gap-2">
+                        📊 Download Report
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-3">
+                <div class="relative flex-1">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">🔍</span>
+                    <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search employee..." 
+                        class="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+                </div>
+                <select id="statusFilter" onchange="filterTable()" class="px-6 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-slate-600 focus:outline-none">
+                    <option value="all">Advance Filter</option>
+                    <option value="Late">Late Arrivals</option>
+                    <option value="OnTime">On Time</option>
+                    <option value="Early">Early</option>
+                    <option value="Night">Night Shift</option>
+                    <option value="Overtime">With Overtime</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Attendance Table with Time Bridge -->
+        <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
             <table class="w-full text-left text-sm">
-                <thead class="bg-gray-50 text-gray-600 font-bold border-b border-gray-200">
+                <thead class="bg-gray-50/50 text-slate-400 font-bold border-b border-gray-100 uppercase text-[10px] tracking-widest">
                     <tr>
-                        <th class="px-6 py-5">ID</th>
-                        <th class="px-6 py-5">Email</th>
-                        <th class="px-6 py-5">Time-in</th>
-                        <th class="px-6 py-5">Time-out</th>
+                        <th class="px-8 py-5">👤 Employee Name</th>
+                        <th class="px-6 py-5 text-center">🕒 Clock-in & Out</th>
+                        <th class="px-6 py-5 text-center">⏳ Overtime</th>
+                        <th class="px-8 py-5 text-right">Remarks</th>
                     </tr>
                 </thead>
                 <tbody id="attendanceTableBody">
@@ -190,7 +575,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, onSnapshot, query, orderBy, setDoc, doc, serverTimestamp, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, query, orderBy, setDoc, doc, serverTimestamp, getDocs, addDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyArXdGOgHeeoX2iqegUvpg5l-eF02SUE-Y",
@@ -214,6 +599,20 @@
     const faceCanvas = document.getElementById('face-canvas');
     const scanLine = document.getElementById('scan-line');
     const snapshotCanvas = document.getElementById('snapshot-canvas');
+    
+    // Store all attendance data for filtering
+    let allAttendanceData = [];
+    // Store employee profiles for quick lookup
+    let employeeProfiles = {};
+    
+    // Date navigation
+    let viewingDate = new Date();
+
+    // Shift schedule configuration
+    const SHIFT_START = {
+        morning: 8, // 8:00 AM
+        night: 21   // 9:00 PM
+    };
 
     async function loadAI() {
         const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
@@ -224,9 +623,25 @@
                 faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
             ]);
             aiStatus.innerText = "Scanner Ready. Loading database...";
+            await loadEmployeeProfiles();
             await trainAdminData();
         } catch (e) {
             aiStatus.innerText = "Scanner Offline.";
+        }
+    }
+
+    async function loadEmployeeProfiles() {
+        try {
+            const adminSnap = await getDocs(collection(db, "admin"));
+            adminSnap.docs.forEach(doc => {
+                const data = doc.data();
+                if (data.profileUrl) {
+                    employeeProfiles[doc.id] = data.profileUrl;
+                }
+            });
+            console.log("Loaded employee profiles:", employeeProfiles);
+        } catch (err) {
+            console.error("Error loading employee profiles:", err);
         }
     }
 
@@ -237,9 +652,14 @@
                 adminSnap.docs.map(async (adminDoc) => {
                     const data = adminDoc.data();
                     if (!data.profileUrl) return null;
-                    const img = await faceapi.fetchImage(data.profileUrl);
-                    const detection = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
-                    return detection ? new faceapi.LabeledFaceDescriptors(`${adminDoc.id}|${data.fullName}`, [detection.descriptor]) : null;
+                    try {
+                        const img = await faceapi.fetchImage(data.profileUrl);
+                        const detection = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
+                        return detection ? new faceapi.LabeledFaceDescriptors(`${adminDoc.id}|${data.fullName}`, [detection.descriptor]) : null;
+                    } catch (err) {
+                        console.error("Error processing face for", adminDoc.id, err);
+                        return null;
+                    }
                 })
             );
             const validDescriptors = labeledDescriptors.filter(d => d !== null);
@@ -249,8 +669,116 @@
                 aiStatus.style.color = "#10b981";
             }
         } catch (err) {
+            console.error("Error training admin data:", err);
             aiStatus.innerText = "Database Sync Failed.";
         }
+    }
+
+    // Helper function para sa duration calculation
+    function calculateDuration(timeIn, timeOut) {
+        if (!timeIn || !timeOut || timeIn === '--:--' || timeOut === '--:--') return { duration: '-', overtime: '-' };
+
+        const parseTime = (t) => {
+            const [time, modifier] = t.split(' ');
+            if (!time || !modifier) return new Date(2026, 0, 1, 0, 0);
+            let [hours, minutes] = time.split(':');
+            hours = parseInt(hours);
+            minutes = parseInt(minutes);
+            
+            if (modifier === 'PM' && hours !== 12) hours += 12;
+            if (modifier === 'AM' && hours === 12) hours = 0;
+            
+            return new Date(2026, 0, 1, hours, minutes);
+        };
+
+        const start = parseTime(timeIn);
+        const end = parseTime(timeOut);
+        let diff = (end - start) / 1000 / 60; // in minutes
+
+        if (diff < 0) diff += 1440; // Para sa overnight shifts
+
+        const hrs = Math.floor(diff / 60);
+        const mins = Math.floor(diff % 60);
+        const durationStr = `${hrs}h ${mins}m`;
+
+        // Overtime calculation (Standard 8 hours = 480 minutes)
+        let overtimeStr = '-';
+        if (diff > 480) {
+            const otDiff = diff - 480;
+            const otHrs = Math.floor(otDiff / 60);
+            const otMins = Math.floor(otDiff % 60);
+            overtimeStr = `${otHrs}h ${otMins}m`;
+        }
+
+        return { duration: durationStr, overtime: overtimeStr };
+    }
+
+    // Function to determine remarks based on time
+    function getRemarks(timeStr) {
+        if (!timeStr || timeStr === '--:--') return 'Duty';
+        
+        // Parse time string (e.g., "8:30 AM")
+        const timeParts = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+        if (!timeParts) return 'Duty';
+        
+        let hour = parseInt(timeParts[1]);
+        const minute = parseInt(timeParts[2]);
+        const period = timeParts[3].toUpperCase();
+        
+        // Convert to 24-hour format
+        if (period === 'PM' && hour !== 12) hour += 12;
+        if (period === 'AM' && hour === 12) hour = 0;
+        
+        const timeValue = hour + minute / 60;
+        
+        // Check against shift start times
+        if (timeValue <= SHIFT_START.morning - 0.5) { // Before 7:30 AM
+            return 'Early';
+        } else if (timeValue <= SHIFT_START.morning + 0.5) { // Between 7:30 AM - 8:30 AM
+            return 'On Time';
+        } else if (timeValue > SHIFT_START.morning + 0.5 && timeValue < 17) { // After 8:30 AM but before 5 PM
+            return 'Late';
+        } else if (timeValue >= 21 || timeValue < 6) { // Night shift (9 PM - 6 AM)
+            return 'Night Shift';
+        } else {
+            return 'Duty';
+        }
+    }
+
+    // Toggle custom shift inputs
+    window.toggleCustomShift = () => {
+        const shiftType = document.getElementById('inputShift').value;
+        const customInputs = document.getElementById('customShiftInputs');
+        
+        if (shiftType === 'custom') {
+            customInputs.classList.remove('hidden');
+        } else {
+            customInputs.classList.add('hidden');
+        }
+    };
+
+    // Toggle edit custom shift inputs
+    window.toggleEditCustomShift = () => {
+        const shiftType = document.getElementById('editShift').value;
+        const customInputs = document.getElementById('editCustomShiftInputs');
+        
+        if (shiftType === 'custom') {
+            customInputs.classList.remove('hidden');
+        } else {
+            customInputs.classList.add('hidden');
+        }
+    };
+
+    // Date navigation functions
+    window.changeDay = (offset) => {
+        viewingDate.setDate(viewingDate.getDate() + offset);
+        updateDateDisplay();
+        filterTable();
+    };
+
+    function updateDateDisplay() {
+        const options = { weekday: 'long', day: 'numeric', month: 'long' };
+        document.getElementById('currentDateDisplay').innerText = viewingDate.toLocaleDateString('en-US', options);
     }
 
     const actionModal = document.getElementById('actionModal');
@@ -273,15 +801,23 @@
         document.getElementById('actionForm').reset();
         capturedImage = null;
 
+        const shiftField = document.getElementById('shiftFieldContainer');
+        const customInputs = document.getElementById('customShiftInputs');
+        
         if (mode === 'register') {
             modalTitle.innerText = "New Admin Registration";
             submitBtn.innerText = "Complete Registration";
             aiStatus.innerText = "PHOTO CAPTURE MODE";
             aiStatus.style.color = "#3b82f6";
             
+            // Make modal more compact for register
+            actionModal.classList.add('register-mode');
+            
             scanLine.classList.add('hidden');
             document.getElementById('idFieldContainer').style.display = 'none';
             document.getElementById('emailFieldContainer').style.display = 'block';
+            shiftField.style.display = 'block';
+            customInputs.classList.add('hidden'); // Hide custom inputs initially
             document.getElementById('inputEmail').required = true;
             document.getElementById('inputName').readOnly = false;
         } else {
@@ -290,9 +826,14 @@
             aiStatus.innerText = "BIOMETRIC SCANNER ACTIVE";
             aiStatus.style.color = "#10b981";
 
+            // Remove compact mode for time-in/out
+            actionModal.classList.remove('register-mode');
+
             scanLine.classList.remove('hidden');
             document.getElementById('idFieldContainer').style.display = 'block';
             document.getElementById('emailFieldContainer').style.display = 'none';
+            shiftField.style.display = 'none';
+            customInputs.classList.add('hidden');
             document.getElementById('inputName').readOnly = true;
         }
 
@@ -307,7 +848,7 @@
                 if (faceMatcher && mode !== 'register') startFaceDetection(displaySize);
             };
         } catch (err) {
-            alert("Camera blocked.");
+            alert("Camera blocked. Please check permissions.");
         }
     };
 
@@ -316,43 +857,58 @@
         detectionInterval = setInterval(async () => {
             if (video.paused || video.ended || !faceMatcher || currentMode === 'register') return;
             
-            const detections = await faceapi.detectAllFaces(video).withFaceLandmarks().withFaceDescriptors();
-            const resizedDetections = faceapi.resizeResults(detections, displaySize);
-            
-            faceCanvas.getContext('2d').clearRect(0, 0, faceCanvas.width, faceCanvas.height);
-            
-            resizedDetections.forEach(detection => {
-                const match = faceMatcher.findBestMatch(detection.descriptor);
-                const box = detection.detection.box;
+            try {
+                const detections = await faceapi.detectAllFaces(video).withFaceLandmarks().withFaceDescriptors();
+                const resizedDetections = faceapi.resizeResults(detections, displaySize);
                 
-                const drawBox = new faceapi.draw.DrawBox(box, { 
-                    label: match.label === 'unknown' ? 'Scanning...' : match.label.split('|')[1],
-                    boxColor: match.label === 'unknown' ? '#ef4444' : '#10b981'
-                });
-                drawBox.draw(faceCanvas);
+                faceCanvas.getContext('2d').clearRect(0, 0, faceCanvas.width, faceCanvas.height);
+                
+                resizedDetections.forEach(detection => {
+                    const match = faceMatcher.findBestMatch(detection.descriptor);
+                    const box = detection.detection.box;
+                    
+                    const drawBox = new faceapi.draw.DrawBox(box, { 
+                        label: match.label === 'unknown' ? 'Scanning...' : match.label.split('|')[1],
+                        boxColor: match.label === 'unknown' ? '#ef4444' : '#10b981'
+                    });
+                    drawBox.draw(faceCanvas);
 
-                if (match.label !== 'unknown') {
-                    const [id, name] = match.label.split('|');
-                    document.getElementById('inputID').value = id;
-                    document.getElementById('inputName').value = name;
-                }
-            });
+                    if (match.label !== 'unknown') {
+                        const [id, name] = match.label.split('|');
+                        document.getElementById('inputID').value = id;
+                        document.getElementById('inputName').value = name;
+                    }
+                });
+            } catch (err) {
+                console.error("Face detection error:", err);
+            }
         }, 100);
     }
 
     const stopCamera = () => {
         clearInterval(detectionInterval);
-        if (stream) stream.getTracks().forEach(track => track.stop());
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
         actionModal.classList.remove('flex');
+        actionModal.classList.remove('register-mode');
         scanLine.classList.add('hidden');
-        faceCanvas.getContext('2d').clearRect(0, 0, faceCanvas.width, faceCanvas.height);
-        snapshotCanvas.getContext('2d').clearRect(0, 0, snapshotCanvas.width, snapshotCanvas.height);
+        if (faceCanvas) {
+            faceCanvas.getContext('2d').clearRect(0, 0, faceCanvas.width, faceCanvas.height);
+        }
+        if (snapshotCanvas) {
+            snapshotCanvas.getContext('2d').clearRect(0, 0, snapshotCanvas.width, snapshotCanvas.height);
+        }
         capturedImage = null;
     };
 
     document.getElementById('closeModalBtn').onclick = stopCamera;
 
     snapBtn.onclick = () => {
+        if (!video || !video.videoWidth) {
+            alert("Camera not ready. Please wait.");
+            return;
+        }
         const context = snapshotCanvas.getContext('2d');
         snapshotCanvas.width = video.videoWidth;
         snapshotCanvas.height = video.videoHeight;
@@ -370,8 +926,38 @@
         const id = document.getElementById('inputID').value;
         const name = document.getElementById('inputName').value;
         const email = document.getElementById('inputEmail').value;
+        
+        // Handle shift selection
+        const shiftType = document.getElementById('inputShift')?.value || 'morning';
+        let finalShiftLabel = "";
+
+        if (shiftType === 'custom') {
+            const start = document.getElementById('customStart').value;
+            const end = document.getElementById('customEnd').value;
+            
+            // Convert 24h to 12h format for display
+            const formatTime = (time) => {
+                if (!time) return '--:--';
+                const [hours, minutes] = time.split(':');
+                const h = parseInt(hours);
+                const ampm = h >= 12 ? 'PM' : 'AM';
+                const hour12 = h % 12 || 12;
+                return `${hour12}:${minutes} ${ampm}`;
+            };
+            
+            const startFormatted = formatTime(start);
+            const endFormatted = formatTime(end);
+            finalShiftLabel = `Custom (${startFormatted} - ${endFormatted})`;
+        } else {
+            const select = document.getElementById('inputShift');
+            finalShiftLabel = select ? select.options[select.selectedIndex].text : "Morning Shift (8:00 AM - 5:00 PM)";
+        }
 
         if (!capturedImage) {
+            if (!video || !video.videoWidth) {
+                alert("No photo captured. Please click 'Capture Photo' first.");
+                return;
+            }
             const context = snapshotCanvas.getContext('2d');
             snapshotCanvas.width = video.videoWidth;
             snapshotCanvas.height = video.videoHeight;
@@ -383,12 +969,27 @@
         submitBtn.innerText = "Uploading & Saving...";
 
         try {
+            // Upload to Cloudinary
             const formData = new FormData();
-            formData.append('file', capturedImage);
+            
+            // Convert base64 to blob
+            const base64Data = capturedImage.split(',')[1];
+            const blob = await fetch(capturedImage).then(res => res.blob());
+            
+            formData.append('file', blob, 'photo.jpg');
             formData.append('upload_preset', UPLOAD_PRESET);
-            const cloudRes = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData });
+            
+            const cloudRes = await fetch(CLOUDINARY_URL, { 
+                method: 'POST', 
+                body: formData 
+            });
+            
+            if (!cloudRes.ok) {
+                throw new Error("Cloudinary upload failed with status: " + cloudRes.status);
+            }
+            
             const cloudData = await cloudRes.json();
-            if (!cloudData.secure_url) throw new Error("Cloudinary upload failed.");
+            if (!cloudData.secure_url) throw new Error("Cloudinary upload failed - no URL returned");
 
             if (currentMode === 'register') {
                 const randomID = String(Math.floor(100000 + Math.random() * 900000)).padStart(6, '0');
@@ -398,34 +999,54 @@
                     email: email,
                     profileUrl: cloudData.secure_url,
                     role: "admin_staff",
+                    shift: finalShiftLabel,
+                    shiftType: shiftType,
+                    customStart: shiftType === 'custom' ? document.getElementById('customStart').value : null,
+                    customEnd: shiftType === 'custom' ? document.getElementById('customEnd').value : null,
                     timestamp: serverTimestamp()
                 });
                 alert(`Registered Successfully: ${customDocID}`);
+                
+                // Update employee profiles
+                employeeProfiles[customDocID] = cloudData.secure_url;
                 await trainAdminData();
             } else {
                 const type = currentMode === 'time-in' ? 'timeIn' : 'timeOut';
                 const currentTime = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                const timestamp = serverTimestamp();
+                
+                // Get the employee's registered photo
+                const profileUrl = employeeProfiles[id] || '';
+                
+                console.log("Saving attendance:", { adminID: id, name, type, time: currentTime, profileUrl });
+                
                 await addDoc(collection(db, "attendance"), {
                     adminID: id,
                     name: name,
                     type: type,
                     time: currentTime,
-                    profileUrl: cloudData.secure_url,
-                    timestamp: serverTimestamp()
+                    profileUrl: profileUrl,
+                    shift: shiftType,
+                    timestamp: timestamp
                 });
-                alert(`Success: ${name}`);
+                alert(`Success: ${name} ${type === 'timeIn' ? 'clocked in' : 'clocked out'} at ${currentTime}`);
             }
             stopCamera();
         } catch (error) {
+            console.error("Error in form submission:", error);
             alert("Error: " + error.message);
         } finally {
             submitBtn.disabled = false;
+            submitBtn.innerText = currentMode === 'time-in' ? "Confirm Time-in" : 
+                                 currentMode === 'time-out' ? "Confirm Time-out" : 
+                                 "Complete Registration";
         }
     };
 
     onAuthStateChanged(auth, (user) => {
-        if (!user) window.location.href = "index.html";
-        else {
+        if (!user) {
+            window.location.href = "index.html";
+        } else {
             document.getElementById('navAdminName').innerText = user.email.split('@')[0];
             document.getElementById('navAdminEmail').innerText = user.email;
         }
@@ -435,74 +1056,481 @@
         e.stopPropagation();
         document.getElementById('profileDropdown').classList.toggle('show');
     };
-    window.onclick = () => document.getElementById('profileDropdown').classList.remove('show');
+    
+    window.onclick = () => {
+        document.getElementById('profileDropdown').classList.remove('show');
+    };
+    
     document.getElementById('logoutBtn').onclick = () => signOut(auth);
 
+    // --- ADMIN LIST MODAL CRUD FUNCTIONS ---
+
+    window.openAdminListModal = () => {
+        document.getElementById('adminListModal').classList.add('flex');
+        document.getElementById('adminListModal').classList.remove('hidden');
+        loadAdminsForCRUD();
+    };
+
+    window.closeAdminListModal = () => {
+        document.getElementById('adminListModal').classList.add('hidden');
+        document.getElementById('adminListModal').classList.remove('flex');
+    };
+
+    // Function to update Analytics inside the modal
+    async function updateAdminStats() {
+        try {
+            const adminSnap = await getDocs(collection(db, "admin"));
+            document.getElementById('statTotalAdmins').innerText = adminSnap.size;
+
+            // Kunin ang attendance today para sa "On Duty" at "Late"
+            const today = new Date().toLocaleDateString();
+            const attendanceSnap = await getDocs(collection(db, "attendance"));
+            
+            let onDuty = 0;
+            let lateCount = 0;
+
+            attendanceSnap.forEach(doc => {
+                const data = doc.data();
+                const logDate = data.timestamp?.toDate().toLocaleDateString();
+                if (logDate === today) {
+                    if (data.type === 'timeIn') onDuty++;
+                    if (getRemarks(data.time) === 'Late') lateCount++;
+                }
+            });
+
+            document.getElementById('statOnDuty').innerText = onDuty;
+            document.getElementById('statLateToday').innerText = lateCount;
+        } catch (err) {
+            console.error("Error updating stats:", err);
+        }
+    }
+
+    // Updated Loader with EDIT Button
+    function loadAdminsForCRUD() {
+        const container = document.getElementById('adminListContainer');
+        updateAdminStats(); // Update numbers
+
+        onSnapshot(collection(db, "admin"), (snapshot) => {
+            container.innerHTML = '';
+            if (snapshot.empty) {
+                container.innerHTML = '<div class="p-8 text-center text-gray-400 text-xs">No admins registered.</div>';
+                return;
+            }
+
+            snapshot.forEach((docSnap) => {
+                const admin = docSnap.data();
+                const id = docSnap.id;
+                
+                const item = document.createElement('div');
+                item.className = "admin-item flex items-center justify-between p-4 hover:bg-blue-50/50 rounded-2xl border border-gray-50 transition-all group";
+                item.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <img src="${admin.profileUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + id}" 
+                             class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
+                             onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=${id}'">
+                        <div class="flex flex-col">
+                            <span class="text-sm font-black text-slate-800 group-hover:text-blue-700">${admin.fullName || 'N/A'}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-bold text-blue-500 uppercase tracking-tighter">${id}</span>
+                                <span class="text-[10px] text-gray-300">|</span>
+                                <span class="text-[10px] font-bold text-gray-400 uppercase">${admin.shift || 'No Shift'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="openEditModal('${id}', '${admin.fullName || 'N/A'}', '${admin.email || ''}', '${admin.shift || ''}', '${admin.profileUrl || ''}')" 
+                            class="p-2.5 bg-white text-blue-500 border border-blue-100 rounded-xl hover:bg-blue-500 hover:text-white transition-all shadow-sm" title="Edit Admin">
+                            ✏️
+                        </button>
+                        <button onclick="deleteAdmin('${id}', '${admin.fullName || 'N/A'}')" 
+                            class="p-2.5 bg-white text-red-500 border border-red-100 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm" title="Delete Admin">
+                            🗑️
+                        </button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+            updateAdminStats(); // Refresh stats when data changes
+        });
+    }
+
+    // Open edit modal
+    window.openEditModal = (id, name, email, shift, profileUrl) => {
+        document.getElementById('editAdminId').value = id;
+        document.getElementById('editName').value = name;
+        document.getElementById('editEmail').value = email;
+        document.getElementById('editProfilePreview').src = profileUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${id}`;
+        
+        // Set shift value
+        const shiftSelect = document.getElementById('editShift');
+        if (shift.includes('Custom')) {
+            shiftSelect.value = 'custom';
+            document.getElementById('editCustomShiftInputs').classList.remove('hidden');
+            // Extract times from "Custom (HH:mm - HH:mm)" or "Custom (H:MM AM/PM - H:MM AM/PM)"
+            const timeMatches = shift.match(/(\d{1,2}:\d{2}\s*(?:AM|PM)?)/g);
+            if (timeMatches && timeMatches.length >= 2) {
+                // Convert to 24-hour format for input
+                const convertTo24Hour = (timeStr) => {
+                    const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+                    if (match) {
+                        let hours = parseInt(match[1]);
+                        const minutes = match[2];
+                        const period = match[3].toUpperCase();
+                        
+                        if (period === 'PM' && hours !== 12) hours += 12;
+                        if (period === 'AM' && hours === 12) hours = 0;
+                        
+                        return `${hours.toString().padStart(2, '0')}:${minutes}`;
+                    }
+                    return timeStr;
+                };
+                
+                document.getElementById('editCustomStart').value = convertTo24Hour(timeMatches[0]);
+                document.getElementById('editCustomEnd').value = convertTo24Hour(timeMatches[1]);
+            }
+        } else {
+            if (shift.toLowerCase().includes('morning')) shiftSelect.value = 'morning';
+            else if (shift.toLowerCase().includes('night')) shiftSelect.value = 'night';
+            else shiftSelect.value = 'flexible';
+            document.getElementById('editCustomShiftInputs').classList.add('hidden');
+        }
+        
+        document.getElementById('editAdminModal').classList.add('flex');
+        document.getElementById('editAdminModal').classList.remove('hidden');
+    };
+
+    // Close edit modal
+    window.closeEditModal = () => {
+        document.getElementById('editAdminModal').classList.add('hidden');
+        document.getElementById('editAdminModal').classList.remove('flex');
+    };
+
+    // Preview image before upload
+    window.previewEditImage = (event) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            document.getElementById('editProfilePreview').src = reader.result;
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    };
+
+    // Edit form submit
+    document.getElementById('editAdminForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('editAdminId').value;
+        const name = document.getElementById('editName').value;
+        const email = document.getElementById('editEmail').value;
+        const shiftType = document.getElementById('editShift').value;
+        
+        let finalShift = "";
+        if (shiftType === 'custom') {
+            const start = document.getElementById('editCustomStart').value;
+            const end = document.getElementById('editCustomEnd').value;
+            
+            // Format times for display
+            const formatTime = (time) => {
+                if (!time) return '--:--';
+                const [hours, minutes] = time.split(':');
+                const h = parseInt(hours);
+                const ampm = h >= 12 ? 'PM' : 'AM';
+                const hour12 = h % 12 || 12;
+                return `${hour12}:${minutes} ${ampm}`;
+            };
+            
+            finalShift = `Custom (${formatTime(start)} - ${formatTime(end)})`;
+        } else {
+            finalShift = document.getElementById('editShift').options[document.getElementById('editShift').selectedIndex].text;
+        }
+
+        try {
+            // Check if profile picture was changed
+            const fileInput = document.getElementById('editProfileUpload');
+            let profileUrl = document.getElementById('editProfilePreview').src;
+            
+            if (fileInput.files.length > 0) {
+                // Upload new image to Cloudinary
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                formData.append('upload_preset', UPLOAD_PRESET);
+                
+                const cloudRes = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData });
+                const cloudData = await cloudRes.json();
+                
+                if (cloudData.secure_url) {
+                    profileUrl = cloudData.secure_url;
+                }
+            }
+
+            await updateDoc(doc(db, "admin", id), {
+                fullName: name,
+                email: email,
+                shift: finalShift,
+                shiftType: shiftType,
+                customStart: shiftType === 'custom' ? document.getElementById('editCustomStart').value : null,
+                customEnd: shiftType === 'custom' ? document.getElementById('editCustomEnd').value : null,
+                profileUrl: profileUrl,
+                updatedAt: serverTimestamp()
+            });
+            
+            alert("Profile updated successfully!");
+            closeEditModal();
+            
+            // Update employee profiles cache
+            employeeProfiles[id] = profileUrl;
+            
+            // Refresh AI recognition
+            await trainAdminData();
+            
+        } catch (err) {
+            alert("Update failed: " + err.message);
+        }
+    };
+
+    // DELETE FUNCTION
+    window.deleteAdmin = async (id, name) => {
+        if (confirm(`Are you sure you want to remove ${name} (#${id}) from the system? This will also affect biometric scanning.`)) {
+            try {
+                await deleteDoc(doc(db, "admin", id));
+                alert("Admin removed successfully.");
+                
+                // Remove from cache
+                delete employeeProfiles[id];
+                
+                // Refresh AI matcher after deletion
+                trainAdminData();
+            } catch (error) {
+                alert("Error deleting admin: " + error.message);
+            }
+        }
+    };
+
+    // SEARCH FILTER FOR MODAL
+    window.filterAdminList = () => {
+        const query = document.getElementById('adminSearch').value.toLowerCase();
+        const items = document.querySelectorAll('.admin-item');
+        items.forEach(item => {
+            const text = item.innerText.toLowerCase();
+            item.style.display = text.includes(query) ? 'flex' : 'none';
+        });
+    };
+
+    // Real-time attendance listener
     onSnapshot(query(collection(db, "attendance"), orderBy("timestamp", "desc")), (snapshot) => {
-        const tableBody = document.getElementById('attendanceTableBody');
-        tableBody.innerHTML = '';
+        console.log("Attendance snapshot received, size:", snapshot.size);
+        allAttendanceData = [];
+        
         snapshot.forEach((doc) => {
             const data = doc.data();
-            const row = document.createElement('tr');
-            row.className = "border-t border-gray-50 hover:bg-gray-50 transition-colors";
-            row.innerHTML = `
-                <td class="px-6 py-4 text-xs font-bold text-blue-600">#${data.adminID || '---'}</td>
-                <td class="px-6 py-4 text-sm font-medium text-slate-700">${data.name || 'N/A'}</td>
-                <td class="px-6 py-4 text-xs text-emerald-600 font-bold">${data.type === 'timeIn' ? data.time : '--:--'}</td>
-                <td class="px-6 py-4 text-xs text-red-600 font-bold">${data.type === 'timeOut' ? data.time : '--:--'}</td>
-            `;
-            tableBody.appendChild(row);
+            
+            const record = {
+                id: data.adminID || '---',
+                name: data.name || 'N/A',
+                type: data.type,
+                time: data.time,
+                profileUrl: data.profileUrl || employeeProfiles[data.adminID] || '',
+                timestamp: data.timestamp
+            };
+            allAttendanceData.push(record);
         });
+        
+        console.log("All attendance data:", allAttendanceData);
+        
+        // Initial date display
+        updateDateDisplay();
+        filterTable();
     });
 
-    // --- EXPORT LOGIC ---
-    window.exportToExcel = () => {
-        const table = document.getElementById("attendanceTableBody");
-        const rows = Array.from(table.querySelectorAll("tr"));
-        if (rows.length === 0 || rows[0].innerText.includes("Loading")) {
-            alert("No data to export.");
-            return;
-        }
-        const data = rows.map(row => {
-            const cols = row.querySelectorAll("td");
-            return {
-                "ID": cols[0].innerText,
-                "Full Name": cols[1].innerText,
-                "Time-in": cols[2].innerText,
-                "Time-out": cols[3].innerText
-            };
+    // Filter table function with 4-column layout
+    window.filterTable = () => {
+        const tableBody = document.getElementById('attendanceTableBody');
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const statusFilter = document.getElementById('statusFilter').value;
+        
+        // Filter by Date
+        const targetDateStr = viewingDate.toLocaleDateString();
+        
+        // Group logs by User for the same day (to get In and Out in one row)
+        const dailyLogs = {};
+        
+        allAttendanceData.forEach(log => {
+            const logDate = log.timestamp?.toDate().toLocaleDateString();
+            if (logDate !== targetDateStr) return;
+
+            if (!dailyLogs[log.id]) {
+                dailyLogs[log.id] = { 
+                    id: log.id, 
+                    name: log.name, 
+                    profileUrl: log.profileUrl, 
+                    timeIn: '--:--', 
+                    timeOut: '--:--' 
+                };
+            }
+            
+            if (log.type === 'timeIn') dailyLogs[log.id].timeIn = log.time;
+            if (log.type === 'timeOut') dailyLogs[log.id].timeOut = log.time;
         });
-        const worksheet = XLSX.utils.json_to_sheet(data);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance");
-        XLSX.writeFile(workbook, `PAF_Attendance_${new Date().toLocaleDateString()}.xlsx`);
+
+        const filteredRows = Object.values(dailyLogs).filter(record => {
+            return record.name.toLowerCase().includes(searchTerm);
+        });
+
+        if (filteredRows.length === 0) {
+            tableBody.innerHTML = `
+                <tr class="h-64">
+                    <td colspan="4" class="text-center text-gray-400 font-medium italic">
+                        No attendance records found for this date
+                    </td>
+                </tr>
+            `;
+        } else {
+            tableBody.innerHTML = filteredRows.map(record => {
+                const stats = calculateDuration(record.timeIn, record.timeOut);
+                const remarks = getRemarks(record.timeIn);
+                
+                let badgeClass = 'badge-duty';
+                let badgeText = remarks;
+                
+                if (remarks === 'Late') {
+                    badgeClass = 'badge-late';
+                } else if (remarks === 'On Time') {
+                    badgeClass = 'badge-ontime';
+                } else if (remarks === 'Early') {
+                    badgeClass = 'badge-early';
+                } else if (remarks === 'Night Shift') {
+                    badgeClass = 'badge-night';
+                }
+                
+                // Filter by status if not 'all'
+                if (statusFilter !== 'all') {
+                    if (statusFilter === 'Overtime' && stats.overtime === '-') return '';
+                    if (statusFilter === 'Late' && remarks !== 'Late') return '';
+                    if (statusFilter === 'OnTime' && remarks !== 'On Time') return '';
+                    if (statusFilter === 'Early' && remarks !== 'Early') return '';
+                    if (statusFilter === 'Night' && remarks !== 'Night Shift') return '';
+                }
+                
+                return `
+                    <tr class="border-t border-gray-100 hover:bg-gray-50/50 transition-all">
+                        <td class="px-8 py-5">
+                            <div class="flex items-center gap-4">
+                                <div class="avatar-container">
+                                    <img src="${record.profileUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + record.id}" 
+                                         alt="${record.name}"
+                                         onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=${record.id}'">
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-bold text-slate-800">${record.name}</span>
+                                    <span class="text-[11px] font-bold text-slate-400">${record.id}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="time-bridge">
+                                <span class="text-[13px] font-black text-orange-500">${record.timeIn}</span>
+                                <div class="bridge-line">
+                                    <div class="bridge-dot" style="left: 0;"></div>
+                                    <span class="duration-label font-bold">${stats.duration}</span>
+                                    <div class="bridge-dot" style="right: 0;"></div>
+                                </div>
+                                <span class="text-[13px] font-black text-slate-700">${record.timeOut}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="text-sm font-black ${stats.overtime !== '-' ? 'text-blue-600' : 'text-slate-400'}">
+                                ${stats.overtime === '-' ? '-' : stats.overtime}
+                            </span>
+                        </td>
+                        <td class="px-8 py-5 text-right">
+                            <span class="${badgeClass}">${badgeText}</span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
     };
 
-    window.exportToPDF = () => {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.setFontSize(18);
-        doc.text("PAF Interactive - Attendance Report", 14, 20);
-        doc.setFontSize(10);
-        doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 28);
-        const tableBody = document.getElementById("attendanceTableBody");
-        const rows = Array.from(tableBody.querySelectorAll("tr")).map(row => {
-            return Array.from(row.querySelectorAll("td")).map(td => td.innerText);
-        });
-        if (rows.length === 0 || rows[0][0].includes("Loading")) {
-            alert("No data to export.");
-            return;
-        }
-        doc.autoTable({
-            head: [['ID', 'Full Name', 'Time-in', 'Time-out']],
-            body: rows,
-            startY: 35,
-            theme: 'grid',
-            headStyles: { fillColor: [30, 58, 138] },
-        });
-        doc.save(`PAF_Report_${new Date().toLocaleDateString()}.pdf`);
+    // --- EXPORT MODAL LOGIC ---
+    let selectedExportFormat = 'csv';
+
+    window.openExportModal = () => {
+        document.getElementById('exportModal').classList.add('flex');
+        document.getElementById('exportModal').classList.remove('hidden');
+        // Default dates (This month)
+        const now = new Date();
+        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+        const lastDay = new Date().toISOString().split('T')[0];
+        document.getElementById('exportFromDate').value = firstDay;
+        document.getElementById('exportToDate').value = lastDay;
     };
 
+    window.closeExportModal = () => {
+        document.getElementById('exportModal').classList.add('hidden');
+        document.getElementById('exportModal').classList.remove('flex');
+    };
+
+    window.setExportFormat = (format) => {
+        selectedExportFormat = format;
+        const isCSV = format === 'csv';
+        document.getElementById('btnFormatCSV').className = isCSV ? 'border-2 border-blue-500 bg-blue-50 p-4 rounded-2xl flex flex-col items-center gap-2' : 'border-2 border-transparent bg-gray-50 p-4 rounded-2xl flex flex-col items-center gap-2';
+        document.getElementById('btnFormatPDF').className = !isCSV ? 'border-2 border-blue-500 bg-blue-50 p-4 rounded-2xl flex flex-col items-center gap-2' : 'border-2 border-transparent bg-gray-50 p-4 rounded-2xl flex flex-col items-center gap-2';
+    };
+
+    window.processExport = async () => {
+        const fromDate = new Date(document.getElementById('exportFromDate').value);
+        const toDate = new Date(document.getElementById('exportToDate').value);
+        toDate.setHours(23, 59, 59);
+
+        const q = query(collection(db, "attendance"), orderBy("timestamp", "desc"));
+        const querySnapshot = await getDocs(q);
+        
+        const filteredData = [];
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            const ts = data.timestamp?.toDate();
+            if (ts >= fromDate && ts <= toDate) {
+                const remarks = getRemarks(data.time);
+                filteredData.push({
+                    ID: data.adminID || '---',
+                    Name: data.name || 'N/A',
+                    'Log Type': data.type === 'timeIn' ? 'Time-in' : 'Time-out',
+                    Time: data.time || '--:--',
+                    Date: ts.toLocaleDateString(),
+                    Remarks: remarks || 'Duty'
+                });
+            }
+        });
+
+        if (filteredData.length === 0) {
+            alert("No records found for the selected range.");
+            return;
+        }
+
+        if (selectedExportFormat === 'csv') {
+            const worksheet = XLSX.utils.json_to_sheet(filteredData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance");
+            XLSX.writeFile(workbook, `PAF_Attendance_Report_${new Date().toLocaleDateString()}.xlsx`);
+        } else {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(18);
+            doc.text("PAF Attendance Report", 14, 20);
+            doc.setFontSize(10);
+            doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 28);
+            doc.autoTable({
+                head: [['ID', 'Name', 'Log Type', 'Time', 'Date', 'Remarks']],
+                body: filteredData.map(d => [d.ID, d.Name, d['Log Type'], d.Time, d.Date, d.Remarks]),
+                startY: 35,
+                theme: 'grid',
+                headStyles: { fillColor: [30, 58, 138] },
+            });
+            doc.save(`PAF_Report_${new Date().toLocaleDateString()}.pdf`);
+        }
+        closeExportModal();
+    };
+
+    // Initial call
+    updateDateDisplay();
     loadAI();
 </script>
 </body>
