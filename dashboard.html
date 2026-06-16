@@ -21,7 +21,7 @@
 </head>
 <body class="bg-slate-50 font-sans text-slate-800">
 
-    <nav class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
+    <nav class="bg-white border-b border-gray-100 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
         <div class="flex items-center gap-2">
              <div class="text-xs font-bold leading-tight">
                 <span class="text-orange-500">PAF</span> <span class="text-blue-900 italic">interactive</span><br>
@@ -29,29 +29,30 @@
              </div>
         </div>
 
-        <div class="hidden md:flex items-center gap-8 font-semibold text-gray-600">
+        <div class="hidden md:flex items-center gap-6 font-semibold text-gray-500 text-sm">
             <a href="#" class="flex items-center gap-2 text-blue-600 bg-blue-50 px-4 py-2 rounded-xl">
                 <span>🏠 Dashboard</span>
             </a>
-            <a href="time.html" class="flex items-center gap-2 hover:text-blue-600">👤 Time-in/Time-out</a>
-            <a href="news.html" class="flex items-center gap-2 hover:text-blue-600">📰 News/Updates</a>
-            <a href="manage.html" class="flex items-center gap-2 hover:text-blue-600">👥 Manage Users</a>
-            <a href="incidents.html" class="flex items-center gap-2 hover:text-blue-600">⚠️ Incident Report</a>
+            <a href="time.html" class="hover:text-blue-600 transition-colors">👤 Time-in/Time-out</a>
+            <a href="news.html" class="hover:text-blue-600 transition-colors">📰 News/Updates</a>
+            <a href="manage.html" class="hover:text-blue-600 transition-colors">👥 Manage Users</a>
+            <a href="inventory.html" class="hover:text-blue-600 transition-colors">📦 Inventory</a>
+            <a href="incidents.html" class="hover:text-blue-600 transition-colors">⚠️ Incident Report</a>
         </div>
 
         <div class="relative">
-            <div id="profileBtn" class="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full border border-gray-200 cursor-pointer hover:bg-gray-200 transition-all">
+            <div id="profileBtn" class="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100 cursor-pointer hover:bg-gray-200 transition-all">
                 <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=aug" alt="avatar" class="w-7 h-7 rounded-full bg-purple-500">
                 <span id="navAdminName" class="text-sm font-bold">Admin</span>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
             </div>
 
-            <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-[60]">
+            <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-[60] hidden">
                 <div class="px-4 py-2 border-b border-gray-50 mb-1">
                     <p class="text-[10px] text-gray-400 uppercase font-bold">Admin Account</p>
                     <p id="navAdminEmail" class="text-xs font-semibold truncate text-blue-900">admin@paf.com</p>
                 </div>
-                <button id="logoutBtn" class="w-full text-left px-4 py-2 text-sm text-red-600 font-bold hover:bg-red-50 flex items-center gap-2 transition-colors">
+                <button id="logoutBtn" class="w-full text-left px-4 py-2 text-sm text-red-600 font-bold hover:bg-red-50 transition-colors flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                     Sign out
                 </button>

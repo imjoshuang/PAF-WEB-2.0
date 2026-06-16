@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="icon" type="image/png" href="PAF_Seal.png">
+    <title>PAF Inventory Management</title>
+    <style>
+        #profileDropdown.show { display: block !important; }
+        .loader { border: 2px solid #f3f3f3; border-top: 2px solid #3b82f6; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        nav { font-family: Arial, sans-serif !important; }
+        .modal { display: none; }
+        .modal.show { display: flex; }
+    </style>
+</head>
+<body class="bg-[#F8FAFC] font-sans text-slate-800">
+
+    <nav class="bg-white border-b border-gray-100 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-2">
+             <div class="text-xs font-bold leading-tight">
+                <span class="text-orange-500">PAF</span> <span class="text-blue-900 italic">interactive</span><br>
+                <span class="text-red-600 text-sm tracking-tighter uppercase">Augmented Reality</span>
+             </div>
+        </div>
+
+        <div class="hidden md:flex items-center gap-6 font-semibold text-gray-500 text-sm">
+            <a href="dashboard.html" class="hover:text-blue-600 transition-colors">🏠 Dashboard</a>
+            <a href="time.html" class="hover:text-blue-600 transition-colors">👤 Time-in/Time-out</a>
+            <a href="news.html" class="hover:text-blue-600 transition-colors">📰 News/Updates</a>
+            <a href="manage.html" class="hover:text-blue-600 transition-colors">👥 Manage Users</a>
+            <a href="inventory.html" class="text-blue-600 bg-blue-50 px-4 py-2 rounded-xl">📦 Inventory</a>
+            <a href="incidents.html" class="hover:text-blue-600 transition-colors">⚠️ Incident Report</a>
+        </div>
+
+        <div class="relative">
+            <div id="profileBtn" class="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100 cursor-pointer hover:bg-gray-200 transition-all">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=aug" alt="avatar" class="w-7 h-7 rounded-full bg-purple-500">
+                <span id="navAdminName" class="text-sm font-bold">Admin</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+            </div>
+            <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-[60] hidden">
+                <div class="px-4 py-2 border-b border-gray-50 mb-1">
+                    <p class="text-[10px] text-gray-400 uppercase font-bold">Admin Account</p>
+                    <p id="navAdminEmail" class="text-xs font-semibold truncate text-blue-900">admin@paf.com</p>
+                </div>
+                <button id="logoutBtn" class="w-full text-left px-4 py-2 text-sm text-red-600 font-bold hover:bg-red-50 transition-colors">Sign out</button>
+            </div>
+        </div>
+    </nav>
+
+    <header class="max-w-6xl mx-auto px-8 pt-10 flex items-center gap-3">
+        <div class="bg-blue-100 p-2 rounded-lg text-blue-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 0v10m-9 4h.01"/></svg>
+        </div>
+        <div>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight">Inventory Management</h1>
+            <p class="text-gray-500 text-sm font-medium">Manage and track museum artifacts and exhibits.</p>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-8">
+        
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm">
+                <p class="text-[10px] font-black uppercase text-gray-400 tracking-widest">Total Items</p>
+                <h3 id="totalItems" class="text-3xl font-black text-slate-900">0</h3>
+            </div>
+            <div class="bg-white p-5 rounded-3xl border border-blue-50 shadow-sm">
+                <p class="text-[10px] font-black uppercase text-blue-400 tracking-widest">In Display</p>
+                <h3 id="inDisplayCount" class="text-3xl font-black text-blue-600">0</h3>
+            </div>
+            <div class="bg-white p-5 rounded-3xl border border-emerald-50 shadow-sm">
+                <p class="text-[10px] font-black uppercase text-emerald-400 tracking-widest">In Storage</p>
+                <h3 id="inStorageCount" class="text-3xl font-black text-emerald-600">0</h3>
+            </div>
+            <div class="bg-white p-5 rounded-3xl border border-red-50 shadow-sm">
+                <p class="text-[10px] font-black uppercase text-red-400 tracking-widest">Missing</p>
+                <h3 id="missingItemsCount" class="text-3xl font-black text-red-600">0</h3>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="relative flex-1 w-full">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2">🔍</span>
+                <input type="text" id="inventorySearch" onkeyup="filterInventory()" placeholder="Search item name or location..." class="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-semibold outline-none focus:ring-4 focus:ring-blue-500/5">
+            </div>
+            <div class="flex gap-2 w-full md:w-auto">
+                <button onclick="openExportModal()" class="flex-1 md:flex-none bg-emerald-600 text-white px-6 py-3 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100 flex items-center justify-center gap-2">
+                    <span>📊</span> Export Report
+                </button>
+                <button onclick="openAddItemModal()" class="flex-1 md:flex-none bg-blue-600 text-white px-8 py-3 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
+                    Add New Item
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-gray-50/50 text-gray-400 font-black uppercase text-[10px] tracking-widest border-b border-gray-100">
+                    <tr>
+                        <th class="px-8 py-5">Image</th>
+                        <th class="px-6 py-5">Item Name</th>
+                        <th class="px-6 py-5">Location</th>
+                        <th class="px-6 py-5">Acquisition Date</th>
+                        <th class="px-6 py-5">Status</th>
+                        <th class="px-8 py-5 text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="inventoryTableBody" class="divide-y divide-gray-50">
+                    <tr>
+                        <td colspan="6" class="px-6 py-20 text-center text-gray-400 font-bold italic">Loading inventory items...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Add/Edit Item Modal -->
+    <div id="itemModal" class="modal fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl max-h-[95vh] flex flex-col overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
+                <h2 id="itemModalTitle" class="text-xl font-black text-slate-900 uppercase italic">Add New Item</h2>
+                <button onclick="closeItemModal()" class="text-gray-400 hover:text-red-500 transition-colors">✕</button>
+            </div>
+            <form id="itemForm" class="p-6 md:p-8 space-y-4 overflow-y-auto">
+                <input type="hidden" id="itemId">
+                
+                <!-- Image Upload -->
+                <div>
+                    <input type="file" id="itemImageUpload" accept="image/*" class="hidden" />
+                    <label for="itemImageUpload" class="cursor-pointer border-2 border-dashed border-gray-200 rounded-2xl aspect-video flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 hover:border-blue-300 transition-all overflow-hidden group">
+                        <img id="itemImagePreview" class="hidden w-full h-full object-cover">
+                        <div id="itemImagePlaceholder" class="text-center space-y-2">
+                            <div class="bg-white p-3 rounded-xl shadow-sm inline-block text-gray-400 group-hover:text-blue-500 transition-colors">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            </div>
+                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest">Click to upload image</p>
+                        </div>
+                    </label>
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1 block">Item Name</label>
+                    <input type="text" id="itemName" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-bold text-sm" placeholder="e.g. P-51 Mustang Model">
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1 block">Description</label>
+                    <textarea id="itemDescription" rows="3" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none text-sm leading-relaxed resize-none" placeholder="Brief description of the item..."></textarea>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1 block">Location</label>
+                        <select id="itemLocation" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-bold text-sm">
+                            <option value="Hall of Heroes">Hall of Heroes</option>
+                            <option value="Aircraft Display">Aircraft Display</option>
+                            <option value="Aviation History">Aviation History</option>
+                            <option value="Tech Gallery">Tech Gallery</option>
+                            <option value="Storage">Storage</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1 block">Acquisition Date</label>
+                        <input type="date" id="itemAcquisitionDate" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-bold text-sm">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1 block">Status</label>
+                    <select id="itemStatus" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-bold text-sm">
+                        <option value="In Display">In Display</option>
+                        <option value="In Storage">In Storage</option>
+                        <option value="Missing">Missing</option>
+                        <option value="Under Maintenance">Under Maintenance</option>
+                    </select>
+                </div>
+                <button type="submit" id="submitItemBtn" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex items-center justify-center gap-2">
+                    <span id="submitItemText">Add Item</span>
+                    <div id="submitItemLoader" class="loader hidden"></div>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Item Details Modal -->
+    <div id="itemDetailsModal" class="modal fixed inset-0 bg-black/60 backdrop-blur-sm z-[120] items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl">
+            <div class="relative h-64 bg-gray-100">
+                <img id="detailsItemImage" src="" alt="Item Image" class="w-full h-full object-cover">
+                <button onclick="closeItemDetailsModal()" class="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors">✕</button>
+            </div>
+            <div class="p-6 space-y-4">
+                <h3 id="detailsItemName" class="text-2xl font-black text-slate-900 uppercase italic"></h3>
+                <p id="detailsItemDescription" class="text-slate-600 leading-relaxed font-normal text-sm"></p>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <p class="text-[10px] font-black uppercase text-gray-400">Location</p>
+                        <p id="detailsItemLocation" class="font-bold text-slate-700"></p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black uppercase text-gray-400">Acquisition Date</p>
+                        <p id="detailsItemAcquisitionDate" class="font-bold text-slate-700"></p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black uppercase text-gray-400">Status</p>
+                        <p id="detailsItemStatus" class="font-bold text-slate-700"></p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black uppercase text-gray-400">Added By</p>
+                        <p id="detailsItemAddedBy" class="font-bold text-slate-700"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 border-t border-gray-100 flex justify-end gap-2">
+                <button id="editItemFromDetailsBtn" onclick="openEditItemModalFromDetails()" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">Edit Item</button>
+                <button onclick="closeItemDetailsModal()" class="bg-gray-200 text-slate-700 px-6 py-3 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-gray-300 transition-all">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteConfirmModal" class="modal fixed inset-0 bg-black/60 z-[130] items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl text-center">
+            <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">🗑️</div>
+            <h3 class="text-lg font-black text-slate-900">Delete Item?</h3>
+            <p class="text-gray-500 text-xs mt-1">Are you sure you want to delete "<span id="deleteTargetItemName" class="font-bold text-slate-800"></span>"?</p>
+            <p class="text-red-500 text-[10px] font-bold mt-2">This action cannot be undone.</p>
+            <div class="grid grid-cols-2 gap-2 mt-6">
+                <button onclick="closeModal('deleteConfirmModal')" class="bg-gray-100 text-slate-700 py-2.5 rounded-lg text-sm font-bold hover:bg-gray-200 transition-colors">Cancel</button>
+                <button id="finalDeleteItemBtn" class="bg-red-600 text-white py-2.5 rounded-lg text-sm font-bold hover:bg-red-700 transition-colors">Confirm Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Report Modal -->
+    <div id="exportReportModal" class="modal fixed inset-0 bg-black/60 backdrop-blur-sm z-[140] items-center justify-center p-4">
+        <div class="bg-white w-full max-w-[450px] rounded-3xl overflow-hidden shadow-2xl">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                <div>
+                    <h2 class="text-lg font-black text-slate-900">Download Inventory Report</h2>
+                    <p class="text-xs text-gray-400 font-medium">Export data in your preferred format</p>
+                </div>
+                <button onclick="closeExportModal()" class="text-gray-400 hover:text-red-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-6">
+                <div>
+                    <label class="text-[10px] font-bold uppercase text-gray-400 block mb-3">Format</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="setExportFormat('csv')" id="btnFormatCSV" class="border-2 border-blue-500 bg-blue-50 p-4 rounded-2xl flex flex-col items-center gap-2 transition-all">
+                            <span class="text-xl">📄</span>
+                            <span class="font-bold text-sm text-blue-900">CSV</span>
+                            <span class="text-[10px] text-blue-400">Excel/Spreadsheet</span>
+                        </button>
+                        <button onclick="setExportFormat('pdf')" id="btnFormatPDF" class="border-2 border-transparent bg-gray-50 p-4 rounded-2xl flex flex-col items-center gap-2 hover:bg-gray-100 transition-all">
+                            <span class="text-xl">📕</span>
+                            <span class="font-bold text-sm text-gray-600">PDF</span>
+                            <span class="text-[10px] text-gray-400">Printable Document</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] font-bold uppercase text-gray-400 ml-1">From Acquisition Date</label>
+                        <input type="date" id="exportFromDate" class="w-full px-4 py-2.5 rounded-xl border border-gray-100 bg-gray-50 text-sm">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase text-gray-400 ml-1">To Acquisition Date</label>
+                        <input type="date" id="exportToDate" class="w-full px-4 py-2.5 rounded-xl border border-gray-100 bg-gray-50 text-sm">
+                    </div>
+                </div>
+
+                <button onclick="processExport()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold text-sm hover:bg-blue-700 shadow-lg shadow-blue-100 flex items-center justify-center gap-2">
+                    📊 Generate & Download Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, updateDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyArXdGOgHeeoX2iqegUvpg5l-eF02SUE-Y",
+            authDomain: "paf06-7d7cb.firebaseapp.com",
+            projectId: "paf06-7d7cb",
+            storageBucket: "paf06-7d7cb.firebasestorage.app",
+            messagingSenderId: "661740924808",
+            appId: "1:661740924808:web:6b00c1341f34e9eb81143d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const cloudName = "duzlklts9"; // Replace with your Cloudinary cloud name
+
+        let currentEditItemId = null;
+        let existingItemImageUrl = "";
+        let adminName = "Admin";
+        let allInventoryData = []; // To store all data for search/filter/export
+
+        // --- SESSION & NAVIGATION ---
+        onAuthStateChanged(auth, (user) => {
+            if (!user) window.location.href = "index.html";
+            else {
+                adminName = user.email.split('@')[0];
+                document.getElementById('navAdminName').innerText = adminName;
+                document.getElementById('navAdminEmail').innerText = user.email;
+            }
+        });
+
+        const profileBtn = document.getElementById('profileBtn');
+        const profileDropdown = document.getElementById('profileDropdown');
+        profileBtn.onclick = (e) => { e.stopPropagation(); profileDropdown.classList.toggle('show'); };
+        window.onclick = () => profileDropdown.classList.remove('show');
+        document.getElementById('logoutBtn').onclick = () => signOut(auth);
+
+        // --- MODAL FUNCTIONS ---
+        window.openModal = (id) => document.getElementById(id).classList.add('show');
+        window.closeModal = (id) => document.getElementById(id).classList.remove('show');
+
+        // Item Add/Edit Modal
+        const itemModal = document.getElementById('itemModal');
+        const itemModalTitle = document.getElementById('itemModalTitle');
+        const itemForm = document.getElementById('itemForm');
+        const itemIdInput = document.getElementById('itemId');
+        const itemNameInput = document.getElementById('itemName');
+        const itemDescriptionInput = document.getElementById('itemDescription');
+        const itemLocationSelect = document.getElementById('itemLocation');
+        const itemAcquisitionDateInput = document.getElementById('itemAcquisitionDate');
+        const itemStatusSelect = document.getElementById('itemStatus');
+        const itemImageUpload = document.getElementById('itemImageUpload');
+        const itemImagePreview = document.getElementById('itemImagePreview');
+        const itemImagePlaceholder = document.getElementById('itemImagePlaceholder');
+        const submitItemBtn = document.getElementById('submitItemBtn');
+        const submitItemText = document.getElementById('submitItemText');
+        const submitItemLoader = document.getElementById('submitItemLoader');
+
+        window.openAddItemModal = () => {
+            currentEditItemId = null;
+            existingItemImageUrl = "";
+            itemForm.reset();
+            itemModalTitle.innerText = "Add New Item";
+            submitItemText.innerText = "Add Item";
+            itemImagePreview.classList.add('hidden');
+            itemImagePlaceholder.classList.remove('hidden');
+            openModal('itemModal');
+        };
+
+        window.openEditItemModal = (id) => {
+            const item = allInventoryData.find(i => i.id === id);
+            if (!item) return;
+
+            currentEditItemId = id;
+            existingItemImageUrl = item.imageUrl || "";
+            
+            itemModalTitle.innerText = "Edit Item";
+            submitItemText.innerText = "Update Item";
+            
+            itemIdInput.value = id;
+            itemNameInput.value = item.itemName;
+            itemDescriptionInput.value = item.description;
+            itemLocationSelect.value = item.location;
+            itemAcquisitionDateInput.value = item.acquisitionDate || "";
+            itemStatusSelect.value = item.status;
+
+            if (item.imageUrl) {
+                itemImagePreview.src = item.imageUrl;
+                itemImagePreview.classList.remove('hidden');
+                itemImagePlaceholder.classList.add('hidden');
+            } else {
+                itemImagePreview.classList.add('hidden');
+                itemImagePlaceholder.classList.remove('hidden');
+            }
+            openModal('itemModal');
+        };
+
+        window.openEditItemModalFromDetails = () => {
+            closeItemDetailsModal();
+            openEditItemModal(currentEditItemId);
+        };
+
+        window.closeItemModal = () => {
+            closeModal('itemModal');
+            itemForm.reset();
+            itemImagePreview.classList.add('hidden');
+            itemImagePlaceholder.classList.remove('hidden');
+            itemImageUpload.value = ''; // Clear file input
+        };
+
+        // Item Details Modal
+        const itemDetailsModal = document.getElementById('itemDetailsModal');
+        window.openItemDetailsModal = (id) => {
+            const item = allInventoryData.find(i => i.id === id);
+            if (!item) return;
+
+            currentEditItemId = id; // Set for potential edit from details
+            document.getElementById('detailsItemImage').src = item.imageUrl || 'https://via.placeholder.com/400x200?text=No+Image';
+            document.getElementById('detailsItemName').innerText = item.itemName;
+            document.getElementById('detailsItemDescription').innerText = item.description;
+            document.getElementById('detailsItemLocation').innerText = item.location;
+            document.getElementById('detailsItemAcquisitionDate').innerText = item.acquisitionDate || 'N/A';
+            document.getElementById('detailsItemStatus').innerText = item.status;
+            document.getElementById('detailsItemAddedBy').innerText = item.addedBy || 'Admin';
+
+            openModal('itemDetailsModal');
+        };
+
+        window.closeItemDetailsModal = () => closeModal('itemDetailsModal');
+
+        // Delete Confirmation Modal
+        const deleteConfirmModal = document.getElementById('deleteConfirmModal');
+        let itemToDeleteId = null;
+        window.confirmDeleteItem = (id, name) => {
+            itemToDeleteId = id;
+            document.getElementById('deleteTargetItemName').innerText = name;
+            openModal('deleteConfirmModal');
+        };
+
+        document.getElementById('finalDeleteItemBtn').onclick = async () => {
+            if (itemToDeleteId) {
+                try {
+                    await deleteDoc(doc(db, "inventory", itemToDeleteId));
+                    alert("Item deleted successfully!");
+                    closeModal('deleteConfirmModal');
+                } catch (err) {
+                    console.error("Error deleting item:", err);
+                    alert("Error deleting item.");
+                }
+            }
+        };
+
+        // --- IMAGE PREVIEW ---
+        itemImageUpload.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    itemImagePreview.src = event.target.result;
+                    itemImagePreview.classList.remove('hidden');
+                    itemImagePlaceholder.classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        // --- FORM SUBMISSION (ADD/EDIT ITEM) ---
+        itemForm.onsubmit = async (e) => {
+            e.preventDefault();
+            
+            submitItemBtn.disabled = true;
+            submitItemLoader.classList.remove('hidden');
+            submitItemText.innerText = currentEditItemId ? "Updating..." : "Adding...";
+
+            try {
+                let finalImageUrl = existingItemImageUrl;
+
+                // Check if a new image was uploaded
+                if (itemImageUpload.files[0]) {
+                    const formData = new FormData();
+                    formData.append('file', itemImageUpload.files[0]);
+                    formData.append('upload_preset', 'ml_default'); // Use your Cloudinary upload preset
+
+                    const cloudRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const cloudData = await cloudRes.json();
+                    finalImageUrl = cloudData.secure_url;
+                } else if (!existingItemImageUrl && !currentEditItemId) {
+                    // If adding a new item and no image is provided
+                    alert("Please upload an image for the item.");
+                    return;
+                }
+
+                const itemData = {
+                    itemName: itemNameInput.value,
+                    description: itemDescriptionInput.value,
+                    location: itemLocationSelect.value,
+                    acquisitionDate: itemAcquisitionDateInput.value,
+                    status: itemStatusSelect.value,
+                    imageUrl: finalImageUrl,
+                    addedBy: adminName,
+                    timestamp: serverTimestamp()
+                };
+
+                if (currentEditItemId) {
+                    // Update existing item
+                    await updateDoc(doc(db, "inventory", currentEditItemId), itemData);
+                    alert("Item updated successfully!");
+                } else {
+                    // Add new item
+                    await addDoc(collection(db, "inventory"), itemData);
+                    alert("Item added successfully!");
+                }
+
+                closeItemModal();
+
+            } catch (err) {
+                console.error("Error saving item:", err);
+                alert("Error saving item: " + err.message);
+            } finally {
+                submitItemBtn.disabled = false;
+                submitItemLoader.classList.add('hidden');
+                submitItemText.innerText = currentEditItemId ? "Update Item" : "Add Item";
+            }
+        };
+
+        // --- REAL-TIME INVENTORY LISTENER ---
+        onSnapshot(query(collection(db, "inventory"), orderBy("timestamp", "desc")), (snapshot) => {
+            const inventoryTableBody = document.getElementById('inventoryTableBody');
+            let total = 0, inDisplay = 0, inStorage = 0, missing = 0;
+
+            allInventoryData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+            if (snapshot.empty) {
+                inventoryTableBody.innerHTML = '<tr><td colspan="6" class="px-6 py-20 text-center text-gray-400 font-bold italic">No inventory items found.</td></tr>';
+            } else {
+                inventoryTableBody.innerHTML = allInventoryData.map(item => {
+                    total++;
+                    if (item.status === "In Display") inDisplay++;
+                    if (item.status === "In Storage") inStorage++;
+                    if (item.status === "Missing") missing++;
+
+                    const date = item.timestamp ? item.timestamp.toDate().toLocaleDateString() : 'Just now';
+                    
+                    let statusClass = "text-slate-500 bg-gray-100";
+                    if (item.status === "In Display") statusClass = "text-blue-600 bg-blue-50";
+                    if (item.status === "In Storage") statusClass = "text-emerald-600 bg-emerald-50";
+                    if (item.status === "Missing") statusClass = "text-red-600 bg-red-50";
+
+                    return `
+                        <tr class="hover:bg-gray-50/50 transition-colors">
+                            <td class="px-8 py-5">
+                                <img src="${item.imageUrl || 'https://via.placeholder.com/50?text=No+Image'}" alt="${item.itemName}" class="w-12 h-12 object-cover rounded-lg border border-gray-100">
+                            </td>
+                            <td class="px-6 py-5 font-black text-slate-700">${item.itemName}</td>
+                            <td class="px-6 py-5 font-medium text-slate-500">${item.location}</td>
+                            <td class="px-6 py-5 text-gray-400 text-xs font-bold italic">${item.acquisitionDate || 'N/A'}</td>
+                            <td class="px-6 py-5">
+                                <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase italic ${statusClass}">${item.status}</span>
+                            </td>
+                            <td class="px-8 py-5 text-right">
+                                <div class="flex justify-end gap-2">
+                                    <button onclick="openItemDetailsModal('${item.id}')" class="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-all" title="View Details">👁️</button>
+                                    <button onclick="openEditItemModal('${item.id}')" class="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-600 hover:text-white transition-all" title="Edit Item">✏️</button>
+                                    <button onclick="confirmDeleteItem('${item.id}', '${item.itemName}')" class="p-2 bg-gray-50 text-gray-400 rounded-lg hover:bg-red-600 hover:text-white transition-all" title="Delete Item">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Update stats
+            document.getElementById('totalItems').innerText = total;
+            document.getElementById('inDisplayCount').innerText = inDisplay;
+            document.getElementById('inStorageCount').innerText = inStorage;
+            document.getElementById('missingItemsCount').innerText = missing;
+        });
+
+        // --- SEARCH FUNCTIONALITY ---
+        window.filterInventory = () => {
+            const searchTerm = document.getElementById('inventorySearch').value.toLowerCase();
+            const filteredItems = allInventoryData.filter(item => 
+                item.itemName.toLowerCase().includes(searchTerm) ||
+                item.location.toLowerCase().includes(searchTerm) ||
+                item.status.toLowerCase().includes(searchTerm)
+            );
+            renderFilteredInventory(filteredItems);
+        };
+
+        function renderFilteredInventory(items) {
+            const inventoryTableBody = document.getElementById('inventoryTableBody');
+            if (items.length === 0) {
+                inventoryTableBody.innerHTML = '<tr><td colspan="6" class="px-6 py-20 text-center text-gray-400 font-bold italic">No matching items found.</td></tr>';
+                return;
+            }
+
+            inventoryTableBody.innerHTML = items.map(item => {
+                const date = item.timestamp ? item.timestamp.toDate().toLocaleDateString() : 'Just now';
+                
+                let statusClass = "text-slate-500 bg-gray-100";
+                if (item.status === "In Display") statusClass = "text-blue-600 bg-blue-50";
+                if (item.status === "In Storage") statusClass = "text-emerald-600 bg-emerald-50";
+                if (item.status === "Missing") statusClass = "text-red-600 bg-red-50";
+
+                return `
+                    <tr class="hover:bg-gray-50/50 transition-colors">
+                        <td class="px-8 py-5">
+                            <img src="${item.imageUrl || 'https://via.placeholder.com/50?text=No+Image'}" alt="${item.itemName}" class="w-12 h-12 object-cover rounded-lg border border-gray-100">
+                        </td>
+                        <td class="px-6 py-5 font-black text-slate-700">${item.itemName}</td>
+                        <td class="px-6 py-5 font-medium text-slate-500">${item.location}</td>
+                        <td class="px-6 py-5 text-gray-400 text-xs font-bold italic">${item.acquisitionDate || 'N/A'}</td>
+                        <td class="px-6 py-5">
+                            <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase italic ${statusClass}">${item.status}</span>
+                        </td>
+                        <td class="px-8 py-5 text-right">
+                            <div class="flex justify-end gap-2">
+                                <button onclick="openItemDetailsModal('${item.id}')" class="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-all" title="View Details">👁️</button>
+                                <button onclick="openEditItemModal('${item.id}')" class="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-600 hover:text-white transition-all" title="Edit Item">✏️</button>
+                                <button onclick="confirmDeleteItem('${item.id}', '${item.itemName}')" class="p-2 bg-gray-50 text-gray-400 rounded-lg hover:bg-red-600 hover:text-white transition-all" title="Delete Item">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // --- EXPORT REPORT MODAL LOGIC ---
+        let selectedExportFormat = 'csv';
+
+        window.openExportModal = () => {
+            document.getElementById('exportReportModal').classList.add('show');
+            // Default dates (This month)
+            const now = new Date();
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+            const lastDay = new Date().toISOString().split('T')[0];
+            document.getElementById('exportFromDate').value = firstDay;
+            document.getElementById('exportToDate').value = lastDay;
+        };
+
+        window.closeExportModal = () => {
+            document.getElementById('exportReportModal').classList.remove('show');
+        };
+
+        window.setExportFormat = (format) => {
+            selectedExportFormat = format;
+            const isCSV = format === 'csv';
+            document.getElementById('btnFormatCSV').className = isCSV ? 'border-2 border-blue-500 bg-blue-50 p-4 rounded-2xl flex flex-col items-center gap-2 transition-all' : 'border-2 border-transparent bg-gray-50 p-4 rounded-2xl flex flex-col items-center gap-2 hover:bg-gray-100 transition-all';
+            document.getElementById('btnFormatPDF').className = !isCSV ? 'border-2 border-blue-500 bg-blue-50 p-4 rounded-2xl flex flex-col items-center gap-2' : 'border-2 border-transparent bg-gray-50 p-4 rounded-2xl flex flex-col items-center gap-2 hover:bg-gray-100 transition-all';
+        };
+
+        window.processExport = async () => {
+            const fromDate = document.getElementById('exportFromDate').value;
+            const toDate = document.getElementById('exportToDate').value;
+            
+            let filteredForExport = allInventoryData;
+
+            if (fromDate && toDate) {
+                const start = new Date(fromDate);
+                const end = new Date(toDate);
+                end.setHours(23, 59, 59, 999); // Include the whole end day
+
+                filteredForExport = allInventoryData.filter(item => {
+                    if (!item.timestamp) return false;
+                    const itemDate = item.timestamp.toDate();
+                    return itemDate >= start && itemDate <= end;
+                });
+            }
+
+            if (filteredForExport.length === 0) {
+                alert("No items found for the selected date range.");
+                return;
+            }
+
+            if (selectedExportFormat === 'csv') {
+                generateInventoryCSV(filteredForExport);
+            } else {
+                generateInventoryPDF(filteredForExport);
+            }
+            closeExportModal();
+        };
+
+        function generateInventoryCSV(data) {
+            const headers = ["Item Name", "Description", "Location", "Acquisition Date", "Status", "Image URL", "Added By", "Timestamp"];
+            const csvRows = [headers.join(',')];
+
+            data.forEach(item => {
+                const row = [
+                    `"${item.itemName}"`,
+                    `"${item.description.replace(/"/g, '""')}"`, // Handle quotes in description
+                    `"${item.location}"`,
+                    `"${item.acquisitionDate || 'N/A'}"`,
+                    `"${item.status}"`,
+                    `"${item.imageUrl || 'N/A'}"`,
+                    `"${item.addedBy || 'N/A'}"`,
+                    `"${item.timestamp ? item.timestamp.toDate().toLocaleString() : 'N/A'}"`
+                ];
+                csvRows.push(row.join(','));
+            });
+
+            const csvContent = csvRows.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.setAttribute('href', URL.createObjectURL(blob));
+            link.setAttribute('download', `PAF_Inventory_Report_${new Date().toLocaleDateString()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function generateInventoryPDF(data) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFontSize(18);
+            doc.text("PAF Museum Inventory Report", 14, 20);
+            doc.setFontSize(10);
+            doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 28);
+            doc.text(`Total Items: ${data.length}`, 14, 35);
+
+            const tableColumn = ["Item Name", "Location", "Acquisition Date", "Status", "Added By"];
+            const tableRows = [];
+
+            data.forEach(item => {
+                const itemData = [
+                    item.itemName,
+                    item.location,
+                    item.acquisitionDate || 'N/A',
+                    item.status,
+                    item.addedBy || 'Admin'
+                ];
+                tableRows.push(itemData);
+            });
+
+            doc.autoTable(tableColumn, tableRows, { startY: 45 });
+            doc.save(`PAF_Inventory_Report_${new Date().toLocaleDateString()}.pdf`);
+        }
+    </script>
+</body>
+</html>
