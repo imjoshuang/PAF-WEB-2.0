@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" type="image/png" href="PAF_Seal.png" />
+  <title>Our History - Philippine Air Force</title>
+
+  <style>
+    .chev { width: 10px; height: 10px; align-self: center; }
+    body, nav, #mobileNavPanel { font-family: 'Poppins', sans-serif !important; }
+    .history-image { aspect-ratio: 16/10; object-fit: cover; }
+    
+    /* Transition for image interaction */
+    .image-container { transition: all 0.3s ease; }
+    .image-container:hover { 
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    }
+    .history-section { opacity: 0; transform: translateY(20px); transition: all 0.6s ease-out; }
+    .history-section.visible { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+
+<body class="bg-white text-slate-900 overflow-x-hidden">
+  <!-- Top Navigation -->
+  <nav class="bg-[#0038A8] text-white sticky top-0 z-50 relative shadow-md">
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 py-3 flex items-center justify-between lg:justify-center gap-3 lg:gap-10">
+      <!-- Mobile hamburger -->
+      <button
+        id="mobileMenuBtn"
+        type="button"
+        class="lg:hidden inline-flex items-center justify-center w-12 h-12 rounded-lg bg-white/10 hover:bg-white/15 border border-white/10"
+        aria-label="Open navigation menu"
+        aria-expanded="false"
+      >
+        <svg viewBox="0 0 24 24" class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 6h16" />
+          <path d="M4 12h16" />
+          <path d="M4 18h16" />
+        </svg>
+      </button>
+
+      <!-- Logo -->
+      <a href="paf-hero.html" class="flex items-center gap-3 flex-none justify-center max-lg:mx-auto hover:opacity-80 transition-opacity">
+        <img src="PAF_Seal.png" alt="PAF Seal" class="w-10 h-10 object-contain" />
+        <div class="leading-tight hidden sm:block">
+          <div class="text-[10px] font-black tracking-widest uppercase">PAF</div>
+          <div class="text-[9px] font-medium opacity-90 whitespace-nowrap">interactive tour museum</div>
+        </div>
+      </a>
+
+      <!-- Desktop links -->
+      <div class="hidden lg:flex items-center justify-center gap-10 font-medium text-xs uppercase tracking-widest relative">
+        <!-- ABOUT US Dropdown -->
+        <div class="relative group border-b-2 border-[#FCD116]">
+          <a href="#" class="flex items-center gap-2 border-b-2 border-transparent group-hover:border-[#FCD116] transition-all py-1">
+            <span>About Us</span>
+            <svg class="chev group-hover:rotate-180 transition-transform duration-200" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path d="M5 7l5 6 5-6H5z" />
+            </svg>
+          </a>
+          <div class="absolute left-1/2 -translate-x-1/2 mt-1 w-48 bg-white text-slate-900 rounded-lg shadow-lg py-2 hidden group-hover:block z-50">
+            <a href="history.html" class="block px-4 py-2 text-sm uppercase bg-gray-100 text-blue-800 transition-colors">History</a>
+            <a href="vision-mission.html" class="block px-4 py-2 text-sm uppercase hover:bg-gray-100 hover:text-blue-800 transition-colors">Vision and Mission</a>
+            <a href="mandate-objectives.html" class="block px-4 py-2 text-sm uppercase hover:bg-gray-100 hover:text-blue-800 transition-colors">Mandate and Objectives</a>
+            <a href="contact-us.html" class="block px-4 py-2 text-sm uppercase hover:bg-gray-100 hover:text-blue-800 transition-colors">Contact Us</a>
+            <a href="#" class="block px-4 py-2 text-sm uppercase hover:bg-gray-100 hover:text-blue-800 transition-colors">Laws and Issuances</a>
+            <a href="#" class="block px-4 py-2 text-sm uppercase hover:bg-gray-100 hover:text-blue-800 transition-colors">Contact Us</a>
+          </div>
+        </div>
+
+        <!-- Other links remain -->
+        <a href="news.html" class="flex items-center gap-2 border-b-2 border-transparent hover:border-[#FCD116] transition-all py-1">
+          <span>Our Museums</span>
+          <svg class="chev" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path d="M5 7l5 6 5-6H5z" />
+          </svg>
+        </a>
+
+        <a href="news-events.html" class="flex items-center gap-2 border-b-2 border-transparent hover:border-[#FCD116] transition-all py-1">
+          <span>News & Events</span>
+          <svg class="chev" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path d="M5 7l5 6 5-6H5z" />
+          </svg>
+        </a>
+
+        <a href="#" class="flex items-center gap-2 border-b-2 border-transparent hover:border-[#FCD116] transition-all py-1">
+          EXHIBITIONS
+          <svg class="chev" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path d="M5 7l5 6 5-6H5z" />
+          </svg>
+        </a>
+
+        <a href="#" class="flex items-center gap-2 border-b-2 border-transparent hover:border-[#FCD116] transition-all py-1">
+          COLLECTIONS
+          <svg class="chev" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path d="M5 7l5 6 5-6H5z" />
+          </svg>
+        </a>
+
+        <a href="manage.html" class="flex items-center gap-2 border-b-2 border-transparent hover:border-[#FCD116] transition-all py-1">
+          SERVICES
+          <svg class="chev" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path d="M5 7l5 6 5-6H5z" />
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Mobile menu panel -->
+    <div id="mobileNavPanel" class="lg:hidden fixed inset-0 z-[200] hidden">
+      <!-- Backdrop Overlay -->
+      <div id="mobileNavOverlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity opacity-0"></div>
+      
+      <!-- Sidebar Content -->
+      <div id="mobileMenuContent" class="absolute inset-y-0 left-0 w-72 bg-[#0038A8] text-white p-6 shadow-2xl flex flex-col transform -translate-x-full transition-transform duration-300 ease-in-out border-r border-white/10">
+        <div class="flex items-center justify-between mb-10">
+          <a href="paf-hero.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <img src="PAF_Seal.png" alt="PAF Seal" class="w-10 h-10 object-contain" />
+            <div class="leading-tight">
+              <div class="text-[10px] font-black tracking-widest uppercase">PAF</div>
+              <div class="text-[9px] font-bold opacity-70 whitespace-nowrap">Interactive Museum</div>
+            </div>
+          </a>
+          <button id="closeMenuBtn" class="text-white/70 hover:text-[#FCD116] transition-colors" aria-label="Close menu">
+            <svg viewBox="0 0 24 24" class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <nav class="flex flex-col items-center gap-6 text-center">
+          <div class="w-full flex flex-col items-center">
+            <button id="mobileAboutBtn" class="flex items-center gap-2 font-medium text-lg tracking-wide text-[#FCD116] uppercase outline-none">
+              ABOUT US
+              <svg id="mobileAboutChev" class="w-4 h-4 transition-transform duration-200" viewBox="0 0 20 20" fill="currentColor"><path d="M5 7l5 6 5-6H5z" /></svg>
+            </button>
+            <div id="mobileAboutMenu" class="flex flex-col gap-4 mt-4 bg-white/5 w-full py-4 rounded-xl border border-white/5">
+              <a href="history.html" class="text-sm uppercase hover:text-[#FCD116] transition-colors">History</a>
+              <a href="vision-mission.html" class="text-sm uppercase hover:text-[#FCD116] transition-colors">Vision and Mission</a>
+              <a href="mandate-objectives.html" class="text-sm uppercase hover:text-[#FCD116] transition-colors">Mandate and Objectives</a>
+              <a href="contact-us.html" class="text-sm uppercase hover:text-[#FCD116] transition-colors">Contact Us</a>
+              <a href="#" class="text-sm uppercase hover:text-[#FCD116] transition-colors">Director's Message</a>
+              <a href="#" class="text-sm uppercase hover:text-[#FCD116] transition-colors">Laws and Issuances</a>
+              <a href="#" class="text-sm uppercase hover:text-[#FCD116] transition-colors">Contact Us</a>
+            </div>
+          </div>
+          <a href="news.html" class="font-medium text-lg tracking-wide hover:text-[#FCD116] transition-colors uppercase">OUR MUSEUMS</a>
+          <a href="news-events.html" class="font-medium text-lg tracking-wide hover:text-[#FCD116] transition-colors uppercase">NEWS & EVENTS</a>
+          <a href="#" class="font-medium text-lg tracking-wide hover:text-[#FCD116] transition-colors uppercase">EXHIBITIONS</a>
+          <a href="#" class="font-medium text-lg tracking-wide hover:text-[#FCD116] transition-colors uppercase">COLLECTIONS</a>
+          <a href="manage.html" class="font-medium text-lg tracking-wide hover:text-[#FCD116] transition-colors uppercase">SERVICES</a>
+        </nav>
+      </div>
+    </div>
+  </nav>
+
+  <!-- History Header -->
+  <header class="bg-[#f8f9fa] py-20 border-b border-gray-100">
+    <div class="max-w-[1200px] mx-auto px-6 text-center">
+      <div class="w-24 h-1 bg-[#C46200] mx-auto mb-6"></div>
+      <h1 class="text-5xl md:text-6xl font-black text-slate-900 tracking-tight mb-4 italic uppercase">Wings of Valor</h1>
+      <p class="text-slate-500 font-medium max-w-2xl mx-auto">A journey through a century of Philippine military aviation and the evolution of the Guardians of our Skies.</p>
+    </div>
+  </header>
+
+  <!-- History Content (Zigzag Format) -->
+  <main class="max-w-[1400px] mx-auto py-12 md:py-20 px-4 sm:px-6 space-y-16 md:space-y-32">
+
+    <!-- Section 1: Early Beginnings -->
+    <section class="history-section flex flex-col md:flex-row items-center gap-8 md:gap-16 lg:gap-24">
+      <div class="w-full md:w-1/2 image-container cursor-zoom-in overflow-hidden rounded-3xl shadow-xl border-b-8 border-[#C46200]">
+        <img src="early ph aviation.jpg" alt="Early Philippine Aviation" class="viewable-image history-image w-full hover:scale-105 transition-transform duration-700">
+      </div>
+      <div class="md:w-1/2 space-y-6">
+        <h2 class="text-3xl font-black text-[#0038A8] uppercase italic">1917: The Seeds of Aviation</h2>
+        <p class="text-slate-600 leading-relaxed font-normal">
+          The history of the Philippine Air Force began with the creation of the <strong>Philippine National Guard</strong> air unit in 1917. Amidst the height of World War I, the first group of Filipino student pilots underwent training at Camp Claudio in Parañaque.
+        </p>
+        <p class="text-slate-600 leading-relaxed font-normal">
+          This pioneering effort established the foundation for formal flight instruction in the country, using Curtiss biplanes to train the first generation of Filipino aviators who dreamed of defending their own sovereign airspace.
+        </p>
+      </div>
+    </section>
+
+    <!-- Section 2: PAAC Era -->
+    <section class="history-section flex flex-col md:flex-row-reverse items-center gap-8 md:gap-16 lg:gap-24">
+      <div class="w-full md:w-1/2 image-container cursor-zoom-in overflow-hidden rounded-3xl shadow-xl border-b-8 border-[#0038A8]">
+        <img src="ph army air corps.jpg" alt="Philippine Army Air Corps" class="viewable-image history-image w-full hover:scale-105 transition-transform duration-700">
+      </div>
+      <div class="md:w-1/2 space-y-6 text-right">
+        <h2 class="text-3xl font-black text-[#0038A8] uppercase italic">1935: Army Air Corps</h2>
+        <p class="text-slate-600 leading-relaxed font-normal">
+          Under the Commonwealth Government and the National Defense Act of 1935, the <strong>Philippine Army Air Corps (PAAC)</strong> was formally organized. This era saw the introduction of the iconic P-26 "Peashooter" and Stearman trainers.
+        </p>
+        <p class="text-slate-600 leading-relaxed font-normal">
+          Headquartered at Zablan Field in Quezon City, the PAAC focused on reconnaissance and observation, proving that the Filipino airman was a capable force in any regional aerial engagement.
+        </p>
+      </div>
+    </section>
+
+    <!-- Section 3: WWII -->
+    <section class="history-section flex flex-col md:flex-row items-center gap-8 md:gap-16 lg:gap-24">
+      <div class="w-full md:w-1/2 image-container cursor-zoom-in overflow-hidden rounded-3xl shadow-xl border-b-8 border-[#C46200]">
+        <img src="villamor.jpg" alt="WWII Gallantry" class="viewable-image history-image w-full hover:scale-105 transition-transform duration-700">
+      </div>
+      <div class="md:w-1/2 space-y-6">
+        <h2 class="text-3xl font-black text-[#0038A8] uppercase italic">1941: Valor in the Sky</h2>
+        <p class="text-slate-600 leading-relaxed font-normal">
+          The outbreak of World War II tested the mettle of Filipino pilots. Led by legends like <strong>Captain Jesus Villamor</strong>, the PAAC engaged technologically superior Japanese forces in dogfights over Batangas and Manila.
+        </p>
+        <p class="text-slate-600 leading-relaxed font-normal">
+          Though outnumbered, their heroism earned them international recognition. After the fall of Bataan, many airmen continued the fight as guerrillas, eventually rebuilding the force from the ashes of war.
+        </p>
+      </div>
+    </section>
+
+    <!-- Section 4: 1947 -->
+    <section class="history-section flex flex-col md:flex-row-reverse items-center gap-8 md:gap-16 lg:gap-24">
+      <div class="w-full md:w-1/2 image-container cursor-zoom-in overflow-hidden rounded-3xl shadow-xl border-b-8 border-[#0038A8]">
+        <img src="july 1.jpg" alt="Birth of the PAF" class="viewable-image history-image w-full hover:scale-105 transition-transform duration-700">
+      </div>
+      <div class="md:w-1/2 space-y-6 text-right">
+        <h2 class="text-3xl font-black text-[#0038A8] uppercase italic">1947: Independence & Expansion</h2>
+        <p class="text-slate-600 leading-relaxed font-normal">
+          On July 1, 1947, by virtue of Executive Order No. 94, the PAF was raised to the status of a <strong>major service command</strong> of the Armed Forces of the Philippines, equal to the Army and Navy.
+        </p>
+        <p class="text-slate-600 leading-relaxed font-normal">
+          The post-war era brought the Jet Age. The PAF became the first air force in Southeast Asia to operate jet fighters, starting with the F-86 Sabre and later the supersonic F-5 Freedom Fighter.
+        </p>
+      </div>
+    </section>
+
+    <!-- Section 5: Modern Day -->
+    <section class="history-section flex flex-col md:flex-row items-center gap-8 md:gap-16 lg:gap-24 pb-20">
+      <div class="w-full md:w-1/2 image-container cursor-zoom-in overflow-hidden rounded-3xl shadow-xl border-b-8 border-[#C46200]">
+        <img src="paf-mus.jpg" alt="Modern PAF" class="viewable-image history-image w-full hover:scale-105 transition-transform duration-700">
+      </div>
+      <div class="md:w-1/2 space-y-6">
+        <h2 class="text-3xl font-black text-[#0038A8] uppercase italic">Present: Guardians of the Skies</h2>
+        <p class="text-slate-600 leading-relaxed font-normal">
+          Today, the PAF continues to modernize with advanced platforms like the FA-50PH Golden Eagle and various heavy-lift assets. Beyond combat, the Air Force serves as a lifeline during national disasters through rapid response and relief.
+        </p>
+        <p class="text-slate-600 leading-relaxed font-normal">
+          The <strong>PAF Aerospace Museum</strong> stands as a testament to this history, preserving the aircraft and stories of the men and kababaihan who secured our freedom from above.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer (similar layout to provided reference) -->
+  <footer class="w-full border-t border-white/10">
+    <div class="bg-[#0038A8] text-white pt-14 pb-10">
+      <div class="max-w-[1600px] mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+          <div class="lg:col-span-2">
+            <h2 class="text-2xl md:text-4xl font-black tracking-tight mb-6">
+              Philippine Air Force Aerospace Museum
+            </h2>
+
+            <p class="text-sm md:text-base leading-relaxed text-white/95 font-normal">
+              Serving as a beacon of aeronautical history, the PAF Aerospace Museum is 
+              dedicated to honoring the legacy of Filipino airmen and educating the 
+              public on the vital role of the Air Force in national security.
+            </p>
+
+            <h3 class="mt-10 text-xl md:text-2xl font-black tracking-tight">
+              Contact Information
+            </h3>
+
+            <div class="mt-4 text-sm md:text-base font-normal leading-relaxed text-white/95">
+              <p>Col Jesus Villamor Air Base, Pasay City, Metro Manila</p>
+              <p>pafmuseum@paf.mil.ph</p>
+              <p>+(632) 8298-1100</p>
+            </div>
+          </div>
+
+          <div class="lg:text-right">
+            <h3 class="text-2xl font-black tracking-tight mb-6 text-[#FFFFFF]">
+              Quicklinks
+            </h3>
+
+            <ul class="space-y-4 text-sm md:text-base font-medium">
+              <li><a href="index.html" class="hover:text-[#FCD116] transition-colors">About Us</a></li>
+              <li><a href="news.html" class="hover:text-[#FCD116] transition-colors">Museums</a></li>
+              <li><a href="news.html" class="hover:text-[#FCD116] transition-colors">Collections</a></li>
+              <li><a href="manage.html" class="hover:text-[#FCD116] transition-colors">Services</a></li>
+              <li><a href="#" class="hover:text-[#FCD116] transition-colors">GAD Corner</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-[#1F1F1F] text-white/90 py-6">
+      <div class="max-w-[1600px] mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="text-sm font-normal text-center md:text-left">
+          ©2024 Philippine Air Force Aerospace Museum. All rights reserved.
+        </div>
+
+        <div class="flex items-center gap-4">
+          <!-- Social buttons -->
+          <a href="#" class="w-10 h-10 rounded-lg bg-white text-black flex items-center justify-center hover:brightness-95 transition" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor" aria-hidden="true">
+              <path d="M22 12a10 10 0 1 0-11.5 9.9v-7h-2.5V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.3 0-1.7.8-1.7 1.6V12h2.9l-.5 2.9h-2.4v7A10 10 0 0 0 22 12z"/>
+            </svg>
+          </a>
+          <a href="#" class="w-10 h-10 rounded-lg bg-white text-black flex items-center justify-center hover:brightness-95 transition" aria-label="Twitter">
+            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor" aria-hidden="true">
+              <path d="M22 5.8c-.7.3-1.5.6-2.3.7.8-.5 1.4-1.3 1.7-2.2-.8.5-1.7.9-2.6 1.1A3.7 3.7 0 0 0 12.8 7c0 .3 0 .7.1 1C9.2 7.8 6 6 4 3.3c-.4.6-.5 1.3-.5 2.1 0 1.3.6 2.4 1.6 3.1-.6 0-1.2-.2-1.7-.5v.1c0 1.9 1.3 3.4 3.1 3.8-.4.1-.8.1-1.3.1-.3 0-.6 0-.9-.1.6 1.7 2.2 2.9 4.1 2.9A7.5 7.5 0 0 1 2 19.5 10.7 10.7 0 0 0 7.8 21c6.9 0 10.7-5.9 10.7-11 0-.2 0-.4 0-.5.7-.5 1.3-1.2 1.8-2z"/>
+            </svg>
+          </a>
+          <a href="#" class="w-10 h-10 rounded-lg bg-white text-black flex items-center justify-center hover:brightness-95 transition" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor" aria-hidden="true">
+              <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm10 2H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3zm-5 4.5A3.5 3.5 0 1 1 8.5 12 3.5 3.5 0 0 1 12 8.5zm0 2A1.5 1.5 0 1 0 13.5 12 1.5 1.5 0 0 0 12 10.5zM17.8 6.2a1 1 0 1 1-1 1 1 1 0 0 1 1-1z"/>
+            </svg>
+          </a>
+          <a href="#" class="w-10 h-10 rounded-lg bg-white text-black flex items-center justify-center hover:brightness-95 transition" aria-label="YouTube">
+            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor" aria-hidden="true">
+              <path d="M21.8 8.1s-.2-1.5-.8-2.1c-.8-.8-1.7-.8-2.1-.9C16.1 4.8 12 4.8 12 4.8h0s-4.1 0-6.9.3c-.4 0-1.3.1-2.1.9-.6.6-.8 2.1-.8 2.1S1.9 9.9 1.9 11.7v.6c0 1.8.4 3.6.4 3.6s.2 1.5.8 2.1c.8.8 1.9.8 2.4.9 1.7.2 7.5.3 7.5.3s4.1 0 6.9-.3c.4 0 1.3-.1 2.1-.9.6-.6.8-2.1.8-2.1s.4-1.8.4-3.6v-.6c0-1.8-.4-3.6-.4-3.6zM10 15.5V8.5l6 3.5-6 3.5z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scroll to top button -->
+    <button id="toTopBtn" type="button"
+      class="fixed z-50 right-4 bottom-6 sm:right-6 sm:bottom-8 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white text-black flex items-center justify-center shadow-lg hover:brightness-95 transition"
+      aria-label="Scroll to top">
+      <svg viewBox="0 0 24 24" class="w-6 h-6" fill="currentColor" aria-hidden="true">
+        <path d="M12 4l-8 8h5v8h6v-8h5l-8-8z"/>
+      </svg>
+    </button>
+
+  </footer>
+
+  <!-- Lightbox Modal for Viewing Images -->
+  <div id="imageLightbox" class="fixed inset-0 z-[2000] hidden items-center justify-center bg-black/95 p-4 backdrop-blur-sm transition-all">
+    <button id="closeLightbox" class="absolute top-6 right-6 text-white hover:text-red-500 transition-colors z-50">
+      <svg viewBox="0 0 24 24" class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    <div class="relative w-full h-full flex items-center justify-center">
+        <img id="lightboxImage" src="" alt="Viewing image" class="max-w-full max-h-full rounded-lg shadow-2xl border-2 border-white/10 object-contain">
+    </div>
+  </div>
+
+  <!-- Scripts (Copied logic from paf-hero.html) -->
+  <script>
+    (function () {
+      // Navigation Controls
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      const mobileNavPanel = document.getElementById('mobileNavPanel');
+      const mobileNavOverlay = document.getElementById('mobileNavOverlay');
+      const mobileMenuContent = document.getElementById('mobileMenuContent');
+      const closeMenuBtn = document.getElementById('closeMenuBtn');
+      const mobileAboutBtn = document.getElementById('mobileAboutBtn');
+      const mobileAboutMenu = document.getElementById('mobileAboutMenu');
+      const mobileAboutChev = document.getElementById('mobileAboutChev');
+
+      const setExpanded = (expanded) => {
+        if (!expanded) closeMobileSubmenus();
+        if (expanded) {
+          mobileNavPanel.classList.remove('hidden');
+          setTimeout(() => {
+            mobileNavOverlay.classList.remove('opacity-0');
+            mobileMenuContent.classList.remove('-translate-x-full');
+          }, 10);
+          document.body.style.overflow = 'hidden';
+        } else {
+          mobileNavOverlay.classList.add('opacity-0');
+          mobileMenuContent.classList.add('-translate-x-full');
+        setTimeout(() => {
+          mobileNavPanel.classList.add('hidden');
+        }, 300);
+          document.body.style.overflow = '';
+        }
+        mobileMenuBtn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+      };
+
+      const closeMobileSubmenus = () => {
+        mobileAboutMenu.classList.add('hidden');
+        mobileAboutChev.classList.remove('rotate-180');
+      };
+
+      mobileAboutBtn.addEventListener('click', () => {
+        mobileAboutMenu.classList.toggle('hidden');
+        mobileAboutChev.classList.toggle('rotate-180');
+      });
+
+      mobileMenuBtn.addEventListener('click', () => setExpanded(true));
+      closeMenuBtn.addEventListener('click', () => setExpanded(false));
+      mobileNavOverlay.addEventListener('click', () => setExpanded(false));
+
+      mobileMenuContent.addEventListener('click', (e) => {
+        const link = e.target.closest('a');
+        if (link) setExpanded(false);
+      });
+
+      // Scroll to top
+      var toTopBtn = document.getElementById('toTopBtn');
+      toTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+      // Lightbox Logic
+      const lightbox = document.getElementById('imageLightbox');
+      const lightboxImg = document.getElementById('lightboxImage');
+      const closeLightbox = document.getElementById('closeLightbox');
+      const historyImages = document.querySelectorAll('.viewable-image');
+
+      historyImages.forEach(img => {
+        img.parentElement.addEventListener('click', () => {
+          lightboxImg.src = img.src;
+          lightbox.classList.remove('hidden');
+          lightbox.classList.add('flex');
+          document.body.style.overflow = 'hidden';
+        });
+      });
+
+      const hideLightbox = () => {
+        lightbox.classList.add('hidden');
+        lightbox.classList.remove('flex');
+        document.body.style.overflow = '';
+      };
+
+      closeLightbox.addEventListener('click', hideLightbox);
+      lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox || e.target.parentElement === lightbox) hideLightbox();
+      });
+
+      // Intersection Observer for History Sections Animation
+      const observerOptions = { threshold: 0.1 };
+      const sectionObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, observerOptions);
+
+      document.querySelectorAll('.history-section').forEach(section => sectionObserver.observe(section));
+
+      window.addEventListener('resize', () => {
+        if (window.innerWidth >= 1024) setExpanded(false);
+      });
+    })();
+  </script>
+</body>
+</html>

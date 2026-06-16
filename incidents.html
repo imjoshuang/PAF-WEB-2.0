@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <link rel="icon" type="image/png" href="PAF_Seal.png">
+    <title>PAF Incident Reports</title>
+    <style>
+        #profileDropdown, #addIncidentModal, #detailsModal { display: none; }
+        #profileDropdown.show, #addIncidentModal.show, #detailsModal.show { display: flex; }
+        nav { font-family: Arial, sans-serif !important; }
+        .loader { border: 2px solid #f3f3f3; border-top: 2px solid #3b82f6; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-[#F8FAFC] font-sans text-slate-800">
+
+    <nav class="bg-white border-b border-gray-100 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-2">
+             <div class="text-xs font-bold leading-tight">
+                <span class="text-orange-500">PAF</span> <span class="text-blue-900 italic">interactive</span><br>
+                <span class="text-red-600 text-sm tracking-tighter uppercase">Augmented Reality</span>
+             </div>
+        </div>
+
+        <div class="hidden md:flex items-center gap-6 font-semibold text-gray-500 text-sm">
+            <a href="dashboard.html" class="hover:text-blue-600 transition-colors">🏠 Dashboard</a>
+            <a href="time.html" class="hover:text-blue-600 transition-colors">👤 Time-in/Time-out</a>
+            <a href="news.html" class="hover:text-blue-600 transition-colors">📰 News/Updates</a>
+            <a href="manage.html" class="hover:text-blue-600 transition-colors">👥 Manage Users</a>
+            <a href="incidents.html" class="text-blue-600 bg-blue-50 px-4 py-2 rounded-xl transition-all">⚠️ Incident Report</a>
+        </div>
+
+        <div class="relative">
+            <div id="profileBtn" class="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100 cursor-pointer hover:bg-gray-200 transition-all">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=aug" alt="avatar" class="w-7 h-7 rounded-full bg-purple-500">
+                <span id="navAdminName" class="text-sm font-bold">Admin</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+            </div>
+            <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-[60] hidden flex-col">
+                <div class="px-4 py-2 border-b border-gray-50 mb-1">
+                    <p class="text-[10px] text-gray-400 uppercase font-bold">Admin Account</p>
+                    <p id="navAdminEmail" class="text-xs font-semibold truncate text-blue-900">admin@paf.com</p>
+                </div>
+                <button id="logoutBtn" class="w-full text-left px-4 py-2 text-sm text-red-600 font-bold hover:bg-red-50 flex items-center gap-2 transition-colors">Sign out</button>
+            </div>
+        </div>
+    </nav>
+
+    <header class="max-w-[1400px] mx-auto px-8 pt-10">
+        <h1 class="text-3xl font-black text-slate-900 tracking-tight italic uppercase">Incident Management</h1>
+        <p class="text-gray-500 text-sm font-medium">Monitoring missing artifacts and security reports inside the museum.</p>
+    </header>
+
+    <main class="max-w-[1400px] mx-auto p-8">
+        
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm">
+                <p class="text-[10px] font-black uppercase text-gray-400 tracking-widest">Total Reports</p>
+                <h3 id="totalIncidents" class="text-3xl font-black text-slate-900">0</h3>
+            </div>
+            <div class="bg-white p-5 rounded-3xl border border-red-50 shadow-sm">
+                <p class="text-[10px] font-black uppercase text-red-400 tracking-widest">Missing Objects</p>
+                <h3 id="missingCount" class="text-3xl font-black text-red-600">0</h3>
+            </div>
+            <div class="bg-white p-5 rounded-3xl border border-blue-50 shadow-sm">
+                <p class="text-[10px] font-black uppercase text-blue-400 tracking-widest">Under Investigation</p>
+                <h3 id="investigatingCount" class="text-3xl font-black text-blue-600">0</h3>
+            </div>
+            <div class="bg-white p-5 rounded-3xl border border-emerald-50 shadow-sm">
+                <p class="text-[10px] font-black uppercase text-emerald-400 tracking-widest">Resolved/Found</p>
+                <h3 id="resolvedCount" class="text-3xl font-black text-emerald-600">0</h3>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="relative flex-1 w-full">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2">🔍</span>
+                <input type="text" id="incidentSearch" placeholder="Search missing object..." class="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-semibold outline-none focus:ring-4 focus:ring-blue-500/5">
+            </div>
+            <div class="flex gap-2 w-full md:w-auto">
+                <button onclick="generatePDFReport()" class="flex-1 md:flex-none bg-emerald-600 text-white px-6 py-3 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100 flex items-center justify-center gap-2">
+                    <span>📊</span> Export PDF
+                </button>
+                <button onclick="openModal('addIncidentModal')" class="flex-1 md:flex-none bg-blue-600 text-white px-8 py-3 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
+                    File New Report
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-gray-50/50 text-gray-400 font-black uppercase text-[10px] tracking-widest border-b border-gray-100">
+                    <tr>
+                        <th class="px-8 py-5">Object Name</th>
+                        <th class="px-6 py-5">Location</th>
+                        <th class="px-6 py-5">Reported Date</th>
+                        <th class="px-6 py-5">Severity</th>
+                        <th class="px-6 py-5">Status</th>
+                        <th class="px-8 py-5 text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="incidentTableBody" class="divide-y divide-gray-50">
+                    <tr>
+                        <td colspan="6" class="px-6 py-20 text-center text-gray-400 font-bold italic">Loading incident logs...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Add Incident Modal -->
+    <div id="addIncidentModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h2 class="text-xl font-black text-slate-900 uppercase italic">File Incident Report</h2>
+                <button onclick="closeModal('addIncidentModal')" class="text-gray-400 hover:text-red-500 transition-colors">✕</button>
+            </div>
+            <form id="incidentForm" class="p-8 space-y-4">
+                <div>
+                    <label class="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1 block">Object/Artifact Name</label>
+                    <input type="text" id="objName" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-bold text-sm" placeholder="e.g. Vintage Pilot Helmet">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1 block">Gallery/Section</label>
+                        <select id="objLocation" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-bold text-sm">
+                            <option value="Hall of Heroes">Hall of Heroes</option>
+                            <option value="Aircraft Display">Aircraft Display</option>
+                            <option value="Aviation History">Aviation History</option>
+                            <option value="Tech Gallery">Tech Gallery</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1 block">Severity</label>
+                        <select id="objSeverity" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-bold text-sm">
+                            <option value="Low">Low (Misplaced)</option>
+                            <option value="Medium" selected>Medium</option>
+                            <option value="High">High (High Value)</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1 block">Description of Incident</label>
+                    <textarea id="objDesc" rows="4" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none text-sm leading-relaxed resize-none" placeholder="Describe how or when it was discovered missing..."></textarea>
+                </div>
+                <button type="submit" id="submitIncidentBtn" class="w-full bg-red-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-red-700 transition-all shadow-lg shadow-red-100 flex items-center justify-center gap-2">
+                    <span>Confirm Report</span>
+                    <div id="submitLoader" class="loader hidden"></div>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyArXdGOgHeeoX2iqegUvpg5l-eF02SUE-Y",
+            authDomain: "paf06-7d7cb.firebaseapp.com",
+            projectId: "paf06-7d7cb",
+            storageBucket: "paf06-7d7cb.firebasestorage.app",
+            messagingSenderId: "661740924808",
+            appId: "1:661740924808:web:6b00c1341f34e9eb81143d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let adminName = "Admin";
+        let allIncidentsData = []; // Store for PDF generation
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) window.location.href = "index.html";
+            else {
+                adminName = user.email.split('@')[0];
+                document.getElementById('navAdminName').innerText = adminName;
+                document.getElementById('navAdminEmail').innerText = user.email;
+            }
+        });
+
+        window.openModal = (id) => {
+            document.getElementById(id).style.display = 'flex';
+        };
+
+        window.closeModal = (id) => {
+            document.getElementById(id).style.display = 'none';
+        };
+
+        document.getElementById('profileBtn').onclick = (e) => {
+            e.stopPropagation();
+            document.getElementById('profileDropdown').classList.toggle('hidden');
+        };
+        window.onclick = () => document.getElementById('profileDropdown').classList.add('hidden');
+        document.getElementById('logoutBtn').onclick = () => signOut(auth);
+
+        // --- FORM SUBMISSION ---
+        const incidentForm = document.getElementById('incidentForm');
+        incidentForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitIncidentBtn');
+            const loader = document.getElementById('submitLoader');
+            
+            btn.disabled = true;
+            loader.classList.remove('hidden');
+
+            try {
+                await addDoc(collection(db, "incidents"), {
+                    objectName: document.getElementById('objName').value,
+                    location: document.getElementById('objLocation').value,
+                    severity: document.getElementById('objSeverity').value,
+                    description: document.getElementById('objDesc').value,
+                    reportedBy: adminName,
+                    status: "Missing",
+                    timestamp: serverTimestamp()
+                });
+                alert("Incident reported successfully!");
+                incidentForm.reset();
+                closeModal('addIncidentModal');
+            } catch (err) {
+                alert("Error filing report.");
+            } finally {
+                btn.disabled = false;
+                loader.classList.add('hidden');
+            }
+        };
+
+        // --- REAL-TIME LISTENER ---
+        onSnapshot(query(collection(db, "incidents"), orderBy("timestamp", "desc")), (snapshot) => {
+            const tableBody = document.getElementById('incidentTableBody');
+            let total = 0, missing = 0, investigating = 0, resolved = 0;
+
+            allIncidentsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+            if (snapshot.empty) {
+                tableBody.innerHTML = '<tr><td colspan="6" class="px-6 py-20 text-center text-gray-400 font-bold italic">No incidents recorded.</td></tr>';
+            } else {
+                tableBody.innerHTML = snapshot.docs.map(docData => {
+                    const data = docData.data();
+                    total++;
+                    if (data.status === "Missing") missing++;
+                    if (data.status === "Investigating") investigating++;
+                    if (data.status === "Resolved") resolved++;
+
+                    const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString() : 'Just now';
+                    
+                    let statusClass = "text-red-600 bg-red-50";
+                    if (data.status === "Investigating") statusClass = "text-blue-600 bg-blue-50";
+                    if (data.status === "Resolved") statusClass = "text-emerald-600 bg-emerald-50";
+
+                    let severityClass = "text-slate-500";
+                    if (data.severity === "High") severityClass = "text-red-500 font-black";
+                    if (data.severity === "Medium") severityClass = "text-orange-500 font-bold";
+
+                    return `
+                        <tr class="hover:bg-gray-50/50 transition-colors">
+                            <td class="px-8 py-5 font-black text-slate-700">${data.objectName}</td>
+                            <td class="px-6 py-5 font-medium text-slate-500">${data.location}</td>
+                            <td class="px-6 py-5 text-gray-400 text-xs font-bold italic">${date}</td>
+                            <td class="px-6 py-5">
+                                <span class="text-[10px] uppercase tracking-tighter ${severityClass}">${data.severity}</span>
+                            </td>
+                            <td class="px-6 py-5">
+                                <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase italic ${statusClass}">${data.status}</span>
+                            </td>
+                            <td class="px-8 py-5 text-right">
+                                <div class="flex justify-end gap-2">
+                                    <button onclick="updateStatus('${docData.id}', 'Resolved')" class="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-600 hover:text-white transition-all" title="Mark as Found">✓</button>
+                                    <button onclick="deleteIncident('${docData.id}')" class="p-2 bg-gray-50 text-gray-400 rounded-lg hover:bg-red-600 hover:text-white transition-all" title="Delete">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Update stats
+            document.getElementById('totalIncidents').innerText = total;
+            document.getElementById('missingCount').innerText = missing;
+            document.getElementById('investigatingCount').innerText = investigating;
+            document.getElementById('resolvedCount').innerText = resolved;
+        });
+
+        window.generatePDFReport = () => {
+            if (allIncidentsData.length === 0) {
+                alert("No records to export.");
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFontSize(20);
+            doc.text('PAF Museum Incident Report', 105, 20, null, null, 'center');
+            
+            doc.setFontSize(10);
+            doc.text(`Generated on: ${new Date().toLocaleString()}`, 105, 30, null, null, 'center');
+            doc.text(`Total Reports: ${allIncidentsData.length}`, 105, 35, null, null, 'center');
+
+            const headers = [['Artifact Name', 'Location', 'Reported Date', 'Severity', 'Status', 'Reported By']];
+            const data = allIncidentsData.map(incident => [
+                incident.objectName,
+                incident.location,
+                incident.timestamp ? incident.timestamp.toDate().toLocaleDateString() : 'Just now',
+                incident.severity,
+                incident.status,
+                incident.reportedBy || 'Admin'
+            ]);
+
+            doc.autoTable({
+                head: headers,
+                body: data,
+                startY: 45,
+                theme: 'striped',
+                headStyles: { fillColor: [30, 58, 138] }, // Navy Blue theme
+                margin: { top: 45 }
+            });
+
+            doc.save(`PAF_Incident_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+        };
+
+        window.updateStatus = async (id, status) => {
+            if(confirm(`Mark this incident as ${status}?`)) {
+                await updateDoc(doc(db, "incidents", id), { status: status });
+            }
+        };
+
+        window.deleteIncident = async (id) => {
+            if(confirm("Permanently delete this report?")) {
+                await deleteDoc(doc(db, "incidents", id));
+            }
+        };
+    </script>
+</body>
+</html>

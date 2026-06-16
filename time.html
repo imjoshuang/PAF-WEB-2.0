@@ -18,6 +18,9 @@
         .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
         .modal { display: none; }
         .modal.flex { display: flex; }
+        nav {
+            font-family: Arial, sans-serif !important;
+        }
 
         /* Scanning Animation */
         .scanner-line {
@@ -226,17 +229,20 @@
 
     <nav class="bg-white border-b border-gray-100 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
         <div class="flex items-center gap-2">
+        <a href="paf-hero.html" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
              <div class="text-xs font-bold leading-tight">
                 <span class="text-orange-500">PAF</span> <span class="text-blue-900 italic">interactive</span><br>
                 <span class="text-red-600 text-sm tracking-tighter uppercase">Augmented Reality</span>
              </div>
         </div>
+        </a>
 
         <div class="hidden md:flex items-center gap-6 font-semibold text-gray-500">
             <a href="dashboard.html" class="flex items-center gap-2 hover:text-blue-600">🏠 Dashboard</a>
             <a href="time.html" class="flex items-center gap-2 text-blue-600 bg-blue-50 px-4 py-2 rounded-xl">👤 Time-in/Time-out</a>
             <a href="news.html" class="flex items-center gap-2 hover:text-blue-600">📰 News/Updates</a>
             <a href="manage.html" class="flex items-center gap-2 hover:text-blue-600">👥 Manage Users</a>
+            <a href="incidents.html" class="flex items-center gap-2 hover:text-blue-600">⚠️ Incident Report</a>
         </div>
 
         <div class="flex items-center gap-4">

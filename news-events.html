@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" type="image/png" href="PAF_Seal.png" />
+  <title>News and Events - Philippine Air Force</title>
+
+  <style>
+    .chev { width: 10px; height: 10px; align-self: center; }
+    body, nav { font-family: 'Poppins', sans-serif !important; }
+    .fade-in { opacity: 0; transform: translateY(20px); transition: all 0.6s ease-out; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+    .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  </style>
+</head>
+
+<body class="bg-white text-slate-900 overflow-x-hidden">
+  <!-- Top Navigation -->
+  <nav class="bg-[#0038A8] text-white sticky top-0 z-50 relative shadow-md">
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 py-3 flex items-center justify-between lg:justify-center gap-3 lg:gap-16">
+      <!-- Mobile hamburger -->
+      <button id="mobileMenuBtn" type="button"
+        class="lg:hidden inline-flex items-center justify-center w-12 h-12 rounded-lg bg-white/10 hover:bg-white/15 border border-white/10"
+        aria-label="Open navigation menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 6h16" /><path d="M4 12h16" /><path d="M4 18h16" />
+        </svg>
+      </button>
+
+      <!-- Logo -->
+      <a href="paf-hero.html" class="flex items-center gap-3 flex-1 lg:flex-none justify-center lg:min-w-0 hover:opacity-80 transition-opacity">
+        <img src="PAF_Seal.png" alt="PAF Seal" class="w-10 h-10 object-contain" />
+        <div class="leading-tight hidden sm:block">
+          <div class="text-[10px] font-black tracking-widest uppercase">PAF</div>
+          <div class="text-[9px] font-medium opacity-90 whitespace-nowrap">interactive tour museum</div>
+        </div>
+      </a>
+
+      <!-- Desktop links -->
+      <div class="hidden lg:flex items-center justify-center gap-10 font-medium text-xs uppercase tracking-widest relative">
+        <div class="relative group">
+          <a href="#" class="flex items-center gap-2 border-b-2 border-transparent group-hover:border-[#FCD116] transition-all py-1">
+            <span>About Us</span>
+            <svg class="chev group-hover:rotate-180 transition-transform duration-200" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M5 7l5 6 5-6H5z" /></svg>
+          </a>
+          <div class="absolute left-1/2 -translate-x-1/2 mt-1 w-48 bg-white text-slate-900 rounded-lg shadow-lg py-2 hidden group-hover:block z-50">
+            <a href="history.html" class="block px-4 py-2 text-sm uppercase hover:bg-gray-100 hover:text-blue-800 transition-colors">History</a>
+            <a href="vision-mission.html" class="block px-4 py-2 text-sm uppercase hover:bg-gray-100 hover:text-blue-800 transition-colors">Vision and Mission</a>
+            <a href="mandate-objectives.html" class="block px-4 py-2 text-sm uppercase hover:bg-gray-100 hover:text-blue-800 transition-colors">Mandate and Objectives</a>
+            <a href="contact-us.html" class="block px-4 py-2 text-sm uppercase hover:bg-gray-100 hover:text-blue-800 transition-colors">Contact Us</a>
+            <a href="#" class="block px-4 py-2 text-sm uppercase hover:bg-gray-100 hover:text-blue-800 transition-colors">Director's Message</a>
+            <a href="#" class="block px-4 py-2 text-sm uppercase hover:bg-gray-100 hover:text-blue-800 transition-colors">Laws and Issuances</a>
+          </div>
+        </div>
+
+        <a href="#" class="flex items-center gap-2 border-b-2 border-transparent hover:border-[#FCD116] transition-all py-1">
+          <span>Our Museums</span>
+          <svg class="chev" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M5 7l5 6 5-6H5z" /></svg>
+        </a>
+
+        <a href="news-events.html" class="flex items-center gap-2 border-b-2 border-[#FCD116] py-1">
+          <span>News & Events</span>
+          <svg class="chev" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M5 7l5 6 5-6H5z" /></svg>
+        </a>
+
+        <a href="#" class="flex items-center gap-2 border-b-2 border-transparent hover:border-[#FCD116] transition-all py-1">
+          EXHIBITIONS
+          <svg class="chev" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M5 7l5 6 5-6H5z" /></svg>
+        </a>
+
+        <a href="#" class="flex items-center gap-2 border-b-2 border-transparent hover:border-[#FCD116] transition-all py-1">
+          COLLECTIONS
+          <svg class="chev" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M5 7l5 6 5-6H5z" /></svg>
+        </a>
+
+        <a href="manage.html" class="flex items-center gap-2 border-b-2 border-transparent hover:border-[#FCD116] transition-all py-1">
+          SERVICES
+          <svg class="chev" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M5 7l5 6 5-6H5z" /></svg>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile menu panel -->
+  <div id="mobileNavPanel" class="lg:hidden fixed inset-0 z-[200] hidden">
+    <!-- Backdrop Overlay -->
+    <div id="mobileNavOverlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity opacity-0"></div>
+    
+    <!-- Sidebar Content -->
+    <div id="mobileMenuContent" class="absolute inset-y-0 left-0 w-72 bg-[#0038A8] text-white p-6 shadow-2xl flex flex-col transform -translate-x-full transition-transform duration-300 ease-in-out border-r border-white/10">
+      <div class="flex items-center justify-between mb-10">
+        <a href="paf-hero.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+          <img src="PAF_Seal.png" alt="PAF Seal" class="w-10 h-10 object-contain" />
+          <div class="leading-tight">
+            <div class="text-[10px] font-black tracking-widest uppercase">PAF</div>
+            <div class="text-[9px] font-bold opacity-70">Interactive Museum</div>
+          </div>
+        </a>
+        <button id="closeMenuBtn" class="text-white/70 hover:text-[#FCD116] transition-colors" aria-label="Close menu">
+          <svg viewBox="0 0 24 24" class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <nav class="flex flex-col items-center gap-6 text-center">
+        <div class="w-full flex flex-col items-center">
+          <button id="mobileAboutBtn" class="flex items-center gap-2 font-medium text-lg tracking-wide hover:text-[#FCD116] transition-colors uppercase outline-none">
+            ABOUT US
+            <svg id="mobileAboutChev" class="w-4 h-4 transition-transform duration-200" viewBox="0 0 20 20" fill="currentColor"><path d="M5 7l5 6 5-6H5z" /></svg>
+          </button>
+          <div id="mobileAboutMenu" class="hidden flex flex-col gap-4 mt-4 bg-white/5 w-full py-4 rounded-xl border border-white/5">
+            <a href="history.html" class="text-sm uppercase hover:text-[#FCD116] transition-colors">History</a>
+            <a href="vision-mission.html" class="text-sm uppercase hover:text-[#FCD116] transition-colors">Vision and Mission</a>
+            <a href="mandate-objectives.html" class="text-sm uppercase hover:text-[#FCD116] transition-colors">Mandate and Objectives</a>
+            <a href="contact-us.html" class="text-sm uppercase hover:text-[#FCD116] transition-colors">Contact Us</a>
+            <a href="#" class="text-sm uppercase hover:text-[#FCD116] transition-colors">Director's Message</a>
+            <a href="#" class="text-sm uppercase hover:text-[#FCD116] transition-colors">Laws and Issuances</a>
+            <a href="#" class="text-sm uppercase hover:text-[#FCD116] transition-colors">Contact Us</a>
+          </div>
+        </div>
+        <a href="news.html" class="font-medium text-lg tracking-wide hover:text-[#FCD116] transition-colors uppercase">OUR MUSEUMS</a>
+        <a href="news-events.html" class="font-medium text-lg tracking-wide hover:text-[#FCD116] transition-colors uppercase">NEWS & EVENTS</a>
+        <a href="#" class="font-medium text-lg tracking-wide hover:text-[#FCD116] transition-colors uppercase">EXHIBITIONS</a>
+        <a href="#" class="font-medium text-lg tracking-wide hover:text-[#FCD116] transition-colors uppercase">COLLECTIONS</a>
+        <a href="manage.html" class="font-medium text-lg tracking-wide hover:text-[#FCD116] transition-colors uppercase">SERVICES</a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="bg-[#f8f9fa] py-12 md:py-20 border-b border-gray-100">
+    <div class="max-w-[1200px] mx-auto px-6 text-center">
+      <div class="w-24 h-1 bg-[#C46200] mx-auto mb-6"></div>
+      <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight mb-4 italic uppercase">
+        News & Events
+      </h1>
+      <p class="text-slate-500 font-medium max-w-2xl mx-auto uppercase text-[10px] sm:text-xs tracking-widest">
+        The latest updates and announcements from the guardians of the skies
+      </p>
+    </div>
+  </header>
+
+  <!-- News Detail Modal -->
+  <div id="newsModal" class="fixed inset-0 z-[1000] hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm transition-all">
+    <div class="bg-white w-full max-w-3xl max-h-[90vh] rounded-3xl overflow-hidden shadow-2xl flex flex-col transform scale-95 transition-transform duration-300" id="modalContainer">
+      <!-- Modal Header (Image) -->
+      <div class="relative h-64 md:h-80 shrink-0">
+        <img id="modalNewsImage" src="" alt="News Image" class="w-full h-full object-cover cursor-zoom-in hover:brightness-110 transition-all duration-300" onclick="window.openLightbox(this.src)">
+        <button id="closeNewsModal" class="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors">
+          <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Modal Body -->
+      <div class="p-6 md:p-10 overflow-y-auto">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="bg-blue-50 text-[#0038A8] text-[10px] font-black uppercase px-3 py-1 rounded-full tracking-widest">Announcement</span>
+          <span id="modalNewsDate" class="text-[11px] font-bold text-slate-400 italic"></span>
+        </div>
+        <h2 id="modalNewsTitle" class="text-2xl md:text-3xl font-black text-slate-900 leading-tight mb-6 uppercase italic tracking-tight"></h2>
+        <div id="modalNewsDescription" class="text-slate-600 leading-relaxed font-normal whitespace-pre-wrap text-sm md:text-base"></div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-6 border-t border-gray-100 flex justify-end bg-gray-50/50">
+        <button id="closeNewsModalBtn" class="px-8 py-3 bg-[#0038A8] text-white rounded-xl font-bold uppercase text-xs tracking-widest hover:brightness-110 transition shadow-lg shadow-blue-200">Close Article</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox Modal for Viewing Images (Full Screen) -->
+  <div id="imageLightbox" class="fixed inset-0 z-[2000] hidden items-center justify-center bg-black/95 p-4 backdrop-blur-sm transition-all duration-300">
+    <button id="closeLightbox" class="absolute top-6 right-6 text-white hover:text-red-500 transition-colors z-50">
+      <svg viewBox="0 0 24 24" class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    <div class="relative w-full h-full flex items-center justify-center">
+        <img id="lightboxImage" src="" alt="Full View" class="max-w-full max-h-full rounded-lg shadow-2xl border-2 border-white/10 object-contain transform scale-95 transition-transform duration-300">
+    </div>
+  </div>
+
+  <main class="max-w-[1000px] mx-auto py-12 md:py-16 px-6">
+    <div id="newsGrid" class="grid grid-cols-1 gap-8">
+      
+      <div class="col-span-full py-20 text-center text-slate-400 font-bold italic">Loading announcements...</div>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div id="paginationContainer" class="flex justify-center items-center gap-2 mt-12 pb-8">
+      <!-- Buttons will be injected here -->
+    </div>
+  </main>
+
+  <button id="toTopBtn" type="button"
+    class="fixed z-50 right-4 bottom-6 sm:right-6 sm:bottom-8 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#0038A8] text-white flex items-center justify-center shadow-lg hover:brightness-110 transition"
+    aria-label="Scroll to top">
+    <svg viewBox="0 0 24 24" class="w-6 h-6" fill="currentColor"><path d="M12 4l-8 8h5v8h6v-8h5l-8-8z"/></svg>
+  </button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyArXdGOgHeeoX2iqegUvpg5l-eF02SUE-Y",
+      authDomain: "paf06-7d7cb.firebaseapp.com",
+      projectId: "paf06-7d7cb",
+      storageBucket: "paf06-7d7cb.firebasestorage.app",
+      messagingSenderId: "661740924808",
+      appId: "1:661740924808:web:6b00c1341f34e9eb81143d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Navigation Toggle for Mobile (only if the required elements exist on this page)
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileNavPanel = document.getElementById('mobileNavPanel');
+    const mobileNavOverlay = document.getElementById('mobileNavOverlay');
+    const mobileMenuContent = document.getElementById('mobileMenuContent');
+    const closeMenuBtn = document.getElementById('closeMenuBtn');
+    const mobileAboutBtn = document.getElementById('mobileAboutBtn');
+    const mobileAboutMenu = document.getElementById('mobileAboutMenu');
+    const mobileAboutChev = document.getElementById('mobileAboutChev');
+
+    if (
+      mobileMenuBtn &&
+      mobileNavPanel &&
+      mobileNavOverlay &&
+      mobileMenuContent &&
+      closeMenuBtn &&
+      mobileAboutBtn &&
+      mobileAboutMenu &&
+      mobileAboutChev
+    ) {
+      const closeMobileSubmenus = () => {
+        mobileAboutMenu.classList.add('hidden');
+        mobileAboutChev.classList.remove('rotate-180');
+      };
+
+      const setExpanded = (expanded) => {
+        if (!expanded) closeMobileSubmenus();
+
+        if (expanded) {
+          mobileNavPanel.classList.remove('hidden');
+          setTimeout(() => {
+            mobileNavOverlay.classList.remove('opacity-0');
+            mobileMenuContent.classList.remove('-translate-x-full');
+          }, 10);
+          document.body.style.overflow = 'hidden';
+        } else {
+          mobileNavOverlay.classList.add('opacity-0');
+          mobileMenuContent.classList.add('-translate-x-full');
+          setTimeout(() => {
+            mobileNavPanel.classList.add('hidden');
+          }, 300);
+          document.body.style.overflow = '';
+        }
+
+        mobileMenuBtn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+      };
+
+      mobileAboutBtn.addEventListener('click', () => {
+        mobileAboutMenu.classList.toggle('hidden');
+        mobileAboutChev.classList.toggle('rotate-180');
+      });
+
+      mobileMenuBtn.addEventListener('click', () => setExpanded(true));
+      closeMenuBtn.addEventListener('click', () => setExpanded(false));
+      mobileNavOverlay.addEventListener('click', () => setExpanded(false));
+      mobileMenuContent.addEventListener('click', (e) => {
+        const link = e.target.closest('a');
+        if (link) setExpanded(false);
+      });
+
+      window.addEventListener('resize', () => {
+        if (window.innerWidth >= 1024) setExpanded(false);
+      });
+    } else {
+      // This page doesn't include the mobile nav panel markup, so avoid JS crashes.
+      console.warn("Mobile navigation elements not found. Skipping mobile nav JS.");
+    }
+
+    // --- MODAL LOGIC ---
+    const newsModal = document.getElementById('newsModal');
+    const modalContainer = document.getElementById('modalContainer');
+    const closeNewsModal = document.getElementById('closeNewsModal');
+    const closeNewsModalBtn = document.getElementById('closeNewsModalBtn');
+
+    const toggleModal = (show) => {
+      if (show) {
+        newsModal.classList.remove('hidden');
+        newsModal.classList.add('flex');
+        setTimeout(() => modalContainer.classList.remove('scale-95'), 10);
+        document.body.style.overflow = 'hidden';
+      } else {
+        modalContainer.classList.add('scale-95');
+        setTimeout(() => {
+          newsModal.classList.add('hidden');
+          newsModal.classList.remove('flex');
+        }, 200);
+        document.body.style.overflow = '';
+      }
+    };
+
+    closeNewsModal.onclick = () => toggleModal(false);
+    closeNewsModalBtn.onclick = () => toggleModal(false);
+    newsModal.onclick = (e) => { if (e.target === newsModal) toggleModal(false); };
+
+    // --- LIGHTBOX LOGIC ---
+    const lightbox = document.getElementById('imageLightbox');
+    const lightboxImg = document.getElementById('lightboxImage');
+    const closeLightbox = document.getElementById('closeLightbox');
+
+    window.openLightbox = (src) => {
+      if (!src) return;
+      lightboxImg.src = src;
+      lightbox.classList.remove('hidden');
+      lightbox.classList.add('flex');
+      setTimeout(() => lightboxImg.classList.remove('scale-95'), 10);
+      document.body.style.overflow = 'hidden';
+    };
+
+    const hideLightbox = () => {
+      lightboxImg.classList.add('scale-95');
+      setTimeout(() => {
+        lightbox.classList.add('hidden');
+        lightbox.classList.remove('flex');
+        // Ibabalik lang ang scroll kung sarado na rin ang news modal
+        if (newsModal.classList.contains('hidden')) document.body.style.overflow = '';
+      }, 200);
+    };
+
+    closeLightbox.onclick = hideLightbox;
+    lightbox.onclick = (e) => { if (e.target === lightbox) hideLightbox(); };
+
+    // Store news globally for modal access
+    let currentNews = [];
+    let currentPage = 1;
+    const newsPerPage = 5;
+
+    window.viewNews = (index) => {
+      const data = currentNews[index];
+      const date = data.timestamp
+        ? data.timestamp.toDate().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+        : 'Recently Published';
+
+      document.getElementById('modalNewsImage').src = data.imageUrl || '';
+      document.getElementById('modalNewsTitle').innerText = data.title || '';
+      document.getElementById('modalNewsDate').innerText = date;
+      document.getElementById('modalNewsDescription').innerText = data.description || '';
+      toggleModal(true);
+    };
+
+    const renderPagination = () => {
+      const container = document.getElementById('paginationContainer');
+      const totalPages = Math.ceil(currentNews.length / newsPerPage);
+      
+      if (totalPages <= 1) {
+        container.innerHTML = '';
+        return;
+      }
+
+      let html = '';
+      // Previous Button
+      html += `
+        <button onclick="window.changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="px-4 py-2 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all ${currentPage === 1 ? 'text-slate-300 cursor-not-allowed' : 'text-[#0038A8] hover:bg-blue-50'}">
+          ← Prev
+        </button>
+      `;
+
+      // Page Numbers
+      for (let i = 1; i <= totalPages; i++) {
+        html += `
+          <button onclick="window.changePage(${i})" class="w-10 h-10 rounded-xl font-bold text-xs transition-all ${currentPage === i ? 'bg-[#0038A8] text-white shadow-lg shadow-blue-200' : 'text-slate-500 hover:bg-gray-100'}">
+            ${i}
+          </button>
+        `;
+      }
+
+      // Next Button
+      html += `
+        <button onclick="window.changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="px-4 py-2 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all ${currentPage === totalPages ? 'text-slate-300 cursor-not-allowed' : 'text-[#0038A8] hover:bg-blue-50'}">
+          Next →
+        </button>
+      `;
+
+      container.innerHTML = html;
+    };
+
+    window.changePage = (page) => {
+      const totalPages = Math.ceil(currentNews.length / newsPerPage);
+      if (page < 1 || page > totalPages) return;
+      currentPage = page;
+      renderNews();
+      window.scrollTo({ top: document.getElementById('newsGrid').offsetTop - 100, behavior: 'smooth' });
+    };
+
+    const renderNews = () => {
+      const newsGrid = document.getElementById('newsGrid');
+      const start = (currentPage - 1) * newsPerPage;
+      const end = start + newsPerPage;
+      const pageItems = currentNews.slice(start, end);
+
+      newsGrid.innerHTML = pageItems.map((data, index) => {
+        const realIndex = start + index;
+        const date = data.timestamp
+          ? data.timestamp.toDate().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+          : 'Recently Published';
+
+        return `
+          <article onclick="window.viewNews(${realIndex})" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col md:flex-row group hover:shadow-xl transition-all duration-300 fade-in visible min-h-[250px] cursor-pointer">
+            <div class="md:w-1/3 aspect-video md:aspect-auto w-full overflow-hidden bg-gray-100">
+              <img src="${data.imageUrl || ''}" alt="${data.title || ''}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+            </div>
+            <div class="p-6 md:p-8 flex flex-col flex-1 justify-center">
+              <div class="flex items-center gap-2 mb-4">
+                <span class="bg-blue-50 text-[#0038A8] text-[10px] font-black uppercase px-3 py-1 rounded-full tracking-widest">Announcement</span>
+                <span class="text-[11px] font-bold text-slate-400 italic">${date}</span>
+              </div>
+              <h3 class="text-xl font-black text-slate-900 leading-tight mb-3 group-hover:text-[#0038A8] transition-colors">${data.title || ''}</h3>
+              <p class="text-sm font-medium text-slate-500 leading-relaxed line-clamp-3 mb-6">${data.description || ''}</p>
+              <div class="pt-4 border-t border-gray-50">
+                <a href="#" class="inline-flex items-center text-xs font-black text-[#C46200] uppercase tracking-widest hover:gap-2 transition-all">
+                  Read Full Article <span class="ml-1">→</span>
+                </a>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+      
+      renderPagination();
+    };
+
+    // --- LOAD NEWS FEED ---
+    onSnapshot(
+      query(collection(db, "news"), orderBy("timestamp", "desc")),
+      (snapshot) => {
+        if (snapshot.empty) {
+          document.getElementById('newsGrid').innerHTML = `<div class="col-span-full py-20 text-center text-slate-400 font-bold italic">No announcements found.</div>`;
+          document.getElementById('paginationContainer').innerHTML = '';
+          return;
+        }
+
+        currentNews = snapshot.docs.map(doc => doc.data());
+        renderNews();
+      }
+    );
+
+    // Scroll to top
+    const toTopBtn = document.getElementById('toTopBtn');
+    if (toTopBtn) {
+      toTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    }
+
+    // Intersection Observer for scroll animations
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
+  </script>
+</body>
+</html>

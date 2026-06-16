@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" type="image/png" href="PAF_Seal.png" />
+  <title>PAF AR - Hero</title>
+
+  <style>
+    /* tiny helper for dropdown chevron alignment (if you add interactions later) */
+    .chev {
+      width: 10px;
+      height: 10px;
+      align-self: center;
+    }
+    body, nav, #mobileNavPanel {
+      font-family: 'Poppins', sans-serif !important;
+    }
+  </style>
+</head>
+
+<body class="bg-white text-slate-900 overflow-x-hidden">
+  <!-- Top Navigation -->
+  <nav class="bg-[#0038A8] text-white sticky top-0 z-50 relative shadow-md">
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 py-3 flex items-center justify-between lg:justify-center gap-3 lg:gap-16">
+      <!-- Mobile hamburger -->
+      <button
+        id="mobileMenuBtn"
+        type="button"
+        class="lg:hidden inline-flex items-center justify-center w-12 h-12 rounded-lg bg-white/10 hover:bg-white/15 border border-white/10"
+        aria-label="Open navigation menu"
+        aria-expanded="false"
+      >
+        <svg viewBox="0 0 24 24" class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 6h16" />
+          <path d="M4 12h16" />
+          <path d="M4 18h16" />
+        </svg>
+      </button>
+
+      <!-- Logo -->
+      <a href="paf-hero.html" class="flex items-center gap-3 flex-1 lg:flex-none justify-center lg:min-w-0 hover:opacity-80 transition-opacity">
+        <img src="PAF_Seal.png" alt="PAF Seal" class="w-10 h-10 object-contain" />
+        <div class="leading-tight hidden sm:block">
+          <div class="text-[10px] font-black tracking-widest uppercase">
+            PAF
+          </div>
+          <div class="text-[9px] font-medium opacity-90 whitespace-nowrap">
+            interactive tour museum
+          </div>
+        </div>
+      </a>
+
+      <!-- Desktop links -->
+      <div class="hidden lg:flex items-center justify-center gap-10 font-medium text-xs uppercase tracking-widest relative">
+        <!-- ABOUT US Dropdown -->
+        <div class="relative group">
+          <a href="#" class="flex items-center gap-2 border-b-2 border-transparent group-hover:border-[#FCD116] transition-all py-1">
+          <span>About Us</span>
+          <svg class="chev group-hover:rotate-180 transition-transform duration-200" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path d="M5 7l5 6 5-6H5z" />
+          </svg>
+        </a>
+          <div class="absolute left-1/2 -translate-x-1/2 mt-1 w-48 bg-white text-slate-900 rounded-lg shadow-lg py-2 hidden group-hover:block z-50">
+            <a href="history.html" class="block px-4 py-2 text-sm uppercase hover:bg-gray-100 hover:text-blue-800 transition-colors">History</a>
+            <a href="vision-mission.html" class="block px-4 py-2 text-sm uppercase hover:bg-gray-100 hover:text-blue-800 transition-colors">Vision and Mission</a>
+            <a href="mandate-objectives.html" class="block px-4 py-2 text-sm uppercase hover:bg-gray-100 hover:text-blue-800 transition-colors">Mandate and Objectives</a>
+            <a href="contact-us.html" class="block px-4 py-2 text-sm uppercase hover:bg-gray-100 hover:text-blue-800 transition-colors">Contact Us</a>
+            <a href="#" class="block px-4 py-2 text-sm uppercase hover:bg-gray-100 hover:text-blue-800 transition-colors">Laws and Issuances</a>
+            <a href="#" class="block px-4 py-2 text-sm uppercase hover:bg-gray-100 hover:text-blue-800 transition-colors">Contact Us</a>
+          </div>
+        </div>
+
+        <!-- Other links remain -->
+        <a href="#" class="flex items-center gap-2 border-b-2 border-transparent hover:border-[#FCD116] transition-all py-1">
+          <span>Our Museums</span>
+          <svg class="chev" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path d="M5 7l5 6 5-6H5z" />
+          </svg>
+        </a>
+
+        <a href="news-events.html" class="flex items-center gap-2 border-b-2 border-transparent hover:border-[#FCD116] transition-all py-1">
+          <span>News & Events</span>
+          <svg class="chev" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path d="M5 7l5 6 5-6H5z" />
+          </svg>
+        </a>
+
+        <a href="#" class="flex items-center gap-2 border-b-2 border-transparent hover:border-[#FCD116] transition-all py-1">
+          EXHIBITIONS
+          <svg class="chev" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path d="M5 7l5 6 5-6H5z" />
+          </svg>
+        </a>
+
+        <a href="#" class="flex items-center gap-2 border-b-2 border-transparent hover:border-[#FCD116] transition-all py-1">
+          COLLECTIONS
+          <svg class="chev" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path d="M5 7l5 6 5-6H5z" />
+          </svg>
+        </a>
+
+        <a href="manage.html" class="flex items-center gap-2 border-b-2 border-transparent hover:border-[#FCD116] transition-all py-1">
+          SERVICES
+          <svg class="chev" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path d="M5 7l5 6 5-6H5z" />
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Mobile menu panel -->
+    <div id="mobileNavPanel" class="lg:hidden fixed inset-0 z-[200] hidden">
+      <div id="mobileNavOverlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity opacity-0"></div>
+      <div id="mobileMenuContent" class="absolute inset-y-0 left-0 w-72 bg-[#0038A8] text-white p-6 shadow-2xl flex flex-col transform -translate-x-full transition-transform duration-300 ease-in-out border-r border-white/10">
+        <div class="flex items-center justify-between mb-10">
+          <a href="paf-hero.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <img src="PAF_Seal.png" alt="PAF Seal" class="w-10 h-10 object-contain" />
+            <div class="leading-tight"><div class="text-[10px] font-black tracking-widest uppercase">PAF</div><div class="text-[9px] font-bold opacity-70 whitespace-nowrap">Interactive Museum</div></div>
+          </a>
+          <button id="closeMenuBtn" class="text-white/70 hover:text-[#FCD116] transition-colors" aria-label="Close menu"><svg viewBox="0 0 24 24" class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18L18 6M6 6l12 12" /></svg></button>
+        </div>
+        <nav class="flex flex-col items-center gap-6 text-center">
+          <div class="w-full flex flex-col items-center">
+            <button id="mobileAboutBtn" class="flex items-center gap-2 font-medium text-lg tracking-wide hover:text-[#FCD116] transition-colors uppercase outline-none">ABOUT US<svg id="mobileAboutChev" class="w-4 h-4 transition-transform duration-200" viewBox="0 0 20 20" fill="currentColor"><path d="M5 7l5 6 5-6H5z" /></svg></button>
+            <div id="mobileAboutMenu" class="hidden flex flex-col gap-4 mt-4 bg-white/5 w-full py-4 rounded-xl border border-white/5">
+              <a href="history.html" class="text-sm uppercase hover:text-[#FCD116] transition-colors">History</a>
+              <a href="vision-mission.html" class="text-sm uppercase hover:text-[#FCD116] transition-colors">Vision and Mission</a>
+              <a href="mandate-objectives.html" class="text-sm uppercase hover:text-[#FCD116] transition-colors">Mandate and Objectives</a>
+              <a href="contact-us.html" class="text-sm uppercase hover:text-[#FCD116] transition-colors">Contact Us</a>
+              <a href="#" class="text-sm uppercase hover:text-[#FCD116] transition-colors">Director's Message</a>
+              <a href="#" class="text-sm uppercase hover:text-[#FCD116] transition-colors">Laws and Issuances</a>
+              <a href="#" class="text-sm uppercase hover:text-[#FCD116] transition-colors">Contact Us</a>
+            </div>
+          </div>
+          <a href="news.html" class="font-medium text-lg tracking-wide hover:text-[#FCD116] transition-colors uppercase">OUR MUSEUMS</a>
+          <a href="news-events.html" class="font-medium text-lg tracking-wide hover:text-[#FCD116] transition-colors uppercase">NEWS & EVENTS</a>
+          <a href="#" class="font-medium text-lg tracking-wide hover:text-[#FCD116] transition-colors uppercase">EXHIBITIONS</a>
+          <a href="#" class="font-medium text-lg tracking-wide hover:text-[#FCD116] transition-colors uppercase">COLLECTIONS</a>
+          <a href="manage.html" class="font-medium text-lg tracking-wide hover:text-[#FCD116] transition-colors uppercase">SERVICES</a>
+        </nav>
+      </div>
+    </div>
+  </nav>
+
+  <script>
+    (function () {
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      const mobileNavPanel = document.getElementById('mobileNavPanel');
+      const mobileNavOverlay = document.getElementById('mobileNavOverlay');
+      const mobileMenuContent = document.getElementById('mobileMenuContent');
+      const closeMenuBtn = document.getElementById('closeMenuBtn');
+      const mobileAboutBtn = document.getElementById('mobileAboutBtn');
+      const mobileAboutMenu = document.getElementById('mobileAboutMenu');
+      const mobileAboutChev = document.getElementById('mobileAboutChev');
+
+      const setExpanded = (expanded) => {
+        if (!expanded) { mobileAboutMenu.classList.add('hidden'); mobileAboutChev.classList.remove('rotate-180'); }
+        if (expanded) {
+          mobileNavPanel.classList.remove('hidden');
+          setTimeout(() => { mobileNavOverlay.classList.remove('opacity-0'); mobileMenuContent.classList.remove('-translate-x-full'); }, 10);
+          document.body.style.overflow = 'hidden';
+        } else {
+          mobileNavOverlay.classList.add('opacity-0'); mobileMenuContent.classList.add('-translate-x-full');
+          setTimeout(() => { mobileNavPanel.classList.add('hidden'); }, 300);
+          document.body.style.overflow = '';
+        }
+      };
+
+      mobileAboutBtn.addEventListener('click', () => { mobileAboutMenu.classList.toggle('hidden'); mobileAboutChev.classList.toggle('rotate-180'); });
+      mobileMenuBtn.addEventListener('click', () => setExpanded(true));
+      closeMenuBtn.addEventListener('click', () => setExpanded(false));
+      mobileNavOverlay.addEventListener('click', () => setExpanded(false));
+      mobileMenuContent.addEventListener('click', (e) => { if (e.target.closest('a')) setExpanded(false); });
+
+      window.addEventListener('resize', () => { if (window.innerWidth >= 1024) setExpanded(false); });
+    })();
+  </script>
+
+  <!-- Hero -->
+<main class="max-w-[1600px] mx-auto px-4 sm:px-6 relative">
+<section class="relative min-h-[calc(100dvh-64px)] md:min-h-[620px] overflow-hidden">
+      <!-- Offline background (inline SVG placeholder) -->
+      <div class="absolute inset-0 w-full h-full bg-[#EAF3FF]">
+        <img src="paf-mus.jpg" alt="PAF Museum" class="w-full h-full object-cover" width="1600" height="620">
+      </div>
+
+      <!-- Right overlay panel (desktop/tablet only) -->
+      <div class="absolute inset-y-0 right-0 hidden md:block w-full md:w-1/2 lg:w-[41%] bg-[#0038A8]/85 backdrop-blur-md">
+        <div class="h-full p-8 md:p-12 flex flex-col justify-center gap-5">
+          <div class="w-24 h-1 bg-[#FCD116]"></div>
+
+          <h1 class="text-white font-black leading-tight text-3xl lg:text-5xl">
+            PAF Aerospace<br />
+            Museum
+          </h1>
+
+          <p class="text-white/95 text-sm md:text-base leading-relaxed max-w-[26rem] font-normal">
+            The Philippine Air Force Aerospace Museum is the premiere institution 
+            dedicated to preserving the gallant history and aeronautical heritage 
+            of our guardians of the skies, showcasing legendary aircraft and 
+            artifacts that defined our nation's defense.
+          </p>
+
+          <p class="text-white/90 text-sm md:text-base leading-relaxed max-w-[26rem] font-normal">
+            Explore the evolution of Philippine aviation through interactive 
+            galleries and outdoor aircraft displays located at Villamor Air Base.
+          </p>
+
+          <!-- Buttons removed as per request -->
+          <div class="pt-2 flex flex-wrap gap-3"></div>
+        </div>
+      </div>
+
+      <!-- Optional left tint for brutalist readability -->
+      <div class="absolute inset-0 bg-gradient-to-r from-black/0 via-black/0 to-black/15 md:hidden"></div>
+    </section>
+
+    <!-- Mobile stacked overlay text (only visible on small screens) -->
+    <section class="md:hidden absolute bottom-0 left-0 w-full bg-[#0038A8] text-white px-4 sm:px-6 py-6 sm:py-10 border-t border-white/15 z-20 max-h-[60vh] overflow-y-auto">
+      <div class="max-w-[720px] mx-auto">
+        <div class="w-24 h-1 bg-[#FCD116] mb-6"></div>
+        <h1 class="text-3xl font-black leading-tight">
+          PAF Aerospace<br />
+          Museum
+        </h1>
+        <p class="mt-4 text-sm leading-relaxed font-normal text-white/95">
+          The PAF Aerospace Museum preserves the rich history of the Philippine Air Force, 
+          from vintage propeller planes to modern jets that served in critical national missions.
+        </p>
+        <p class="mt-3 text-sm leading-relaxed font-normal text-white/90">
+          Experience a journey through time and technology in this one-of-a-kind aerospace collection.
+        </p>
+
+        <!-- Buttons removed as per request -->
+        <div class="mt-6 flex flex-wrap gap-3"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- History Narrative Section -->
+  <section class="max-w-[1600px] mx-auto px-4 sm:px-6 py-16 bg-white">
+    <h2 class="text-4xl md:text-5xl font-black text-center text-slate-900 mb-16">
+      Wings of Heritage: The PAF Story
+    </h2>
+
+    <div class="space-y-20">
+      <!-- Narrative Item 1: Image Left, Text Right -->
+      <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+        <div class="w-full md:w-1/2 overflow-hidden rounded-xl shadow-lg">
+          <img src="early foundations.jpg" alt="Early Foundations" class="w-full aspect-video object-cover hover:scale-105 transition-transform duration-500" loading="lazy">
+        </div>
+        <div class="w-full md:w-1/2 space-y-4">
+          <h3 class="text-2xl font-black text-slate-900">Foundations of Valor</h3>
+          <p class="text-base leading-relaxed text-slate-700 font-normal">
+            The Philippine Air Force traces its lineage to the Philippine Constabulary Air Corps (PCAC) 
+            formed in the early 1930s. Formally established as a separate branch of the AFP in 1947, 
+            the PAF inherited a legacy of courage and technical skill that laid the groundwork 
+            for the defense of our sovereign airspace.
+          </p>
+        </div>
+      </div>
+
+      <!-- Narrative Item 2: Image Right, Text Left -->
+      <div class="flex flex-col md:flex-row-reverse items-center gap-8 md:gap-12">
+        <div class="w-full md:w-1/2 overflow-hidden rounded-xl shadow-lg">
+          <img src="golden age.jpg" alt="Golden Age" class="w-full aspect-video object-cover hover:scale-105 transition-transform duration-500" loading="lazy">
+        </div>
+        <div class="w-full md:w-1/2 space-y-4">
+          <h3 class="text-2xl font-black text-slate-900">Guardians of the Skies</h3>
+          <p class="text-base leading-relaxed text-slate-700 font-normal">
+            Throughout the decades, the PAF played a vital role in national security and regional 
+            stability. From the iconic P-51 Mustangs of the post-war era to the supersonic F-5 
+            Freedom Fighters, the Air Force has consistently evolved to meet the challenges of 
+            each generation, earning the respect of its neighbors and the trust of its people.
+          </p>
+        </div>
+      </div>
+
+      <!-- Narrative Item 3: Image Left, Text Right -->
+      <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+        <div class="w-full md:w-1/2 overflow-hidden rounded-xl shadow-lg">
+          <img src="museum park.jpg" alt="Museum Park" class="w-full aspect-video object-cover hover:scale-105 transition-transform duration-500" loading="lazy">
+        </div>
+        <div class="w-full md:w-1/2 space-y-4">
+          <h3 class="text-2xl font-black text-slate-900">Preserving Aviation Heritage</h3>
+          <p class="text-base leading-relaxed text-slate-700 font-normal">
+            The PAF Aerospace Museum at Col. Jesus Villamor Air Base was established to immortalize 
+            the stories of our airmen. It houses an impressive collection of aircraft, uniforms, 
+            weapons, and equipment, serving as a sanctuary of knowledge for students, military 
+            historians, and aviation enthusiasts alike.
+          </p>
+        </div>
+      </div>
+
+      <!-- Narrative Item 4: Image Right, Text Left -->
+      <div class="flex flex-col md:flex-row-reverse items-center gap-8 md:gap-12">
+        <div class="w-full md:w-1/2 overflow-hidden rounded-xl shadow-lg">
+          <img src="future tech.png" alt="Future Tech" class="w-full aspect-video object-cover hover:scale-105 transition-transform duration-500" loading="lazy">
+        </div>
+        <div class="w-full md:w-1/2 space-y-4">
+          <h3 class="text-2xl font-black text-slate-900">Inspiring Next-Gen Aviators</h3>
+          <p class="text-base leading-relaxed text-slate-700 font-normal">
+            Moving forward, the museum is embracing digital transformation. Through interactive 
+            exhibits and Augmented Reality (AR) technology, we aim to make history tangible for 
+            the youth. Our goal is to ignite the flame of patriotism and inspire the next 
+            generation of Filipino pilots, engineers, and aerospace leaders.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer (similar layout to provided reference) -->
+  <footer class="w-full border-t border-white/10">
+    <div class="bg-[#0038A8] text-white pt-14 pb-10">
+      <div class="max-w-[1600px] mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+          <div class="lg:col-span-2">
+            <h2 class="text-2xl md:text-4xl font-black tracking-tight mb-6">
+              Philippine Air Force Aerospace Museum
+            </h2>
+
+            <p class="text-sm md:text-base leading-relaxed text-white/95 font-normal">
+              Serving as a beacon of aeronautical history, the PAF Aerospace Museum is 
+              dedicated to honoring the legacy of Filipino airmen and educating the 
+              public on the vital role of the Air Force in national security.
+            </p>
+
+            <h3 class="mt-10 text-xl md:text-2xl font-black tracking-tight">
+              Contact Information
+            </h3>
+
+            <div class="mt-4 text-sm md:text-base font-normal leading-relaxed text-white/95">
+              <p>Col Jesus Villamor Air Base, Pasay City, Metro Manila</p>
+              <p>pafmuseum@paf.mil.ph</p>
+              <p>+(632) 8298-1100</p>
+            </div>
+          </div>
+
+          <div class="lg:text-right">
+            <h3 class="text-2xl font-black tracking-tight mb-6 text-[#FFFFFF]">
+              Quicklinks
+            </h3>
+
+            <ul class="space-y-4 text-sm md:text-base font-medium">
+              <li><a href="index.html" class="hover:text-[#FCD116] transition-colors">About Us</a></li>
+              <li><a href="news.html" class="hover:text-[#FCD116] transition-colors">Museums</a></li>
+              <li><a href="news.html" class="hover:text-[#FCD116] transition-colors">Collections</a></li>
+              <li><a href="manage.html" class="hover:text-[#FCD116] transition-colors">Services</a></li>
+              <li><a href="#" class="hover:text-[#FCD116] transition-colors">GAD Corner</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-[#1F1F1F] text-white/90 py-6">
+      <div class="max-w-[1600px] mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="text-sm font-normal text-center md:text-left">
+          ©2024 Philippine Air Force Aerospace Museum. All rights reserved.
+        </div>
+
+        <div class="flex items-center gap-4">
+          <!-- Social buttons -->
+          <a href="#" class="w-10 h-10 rounded-lg bg-white text-black flex items-center justify-center hover:brightness-95 transition" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor" aria-hidden="true">
+              <path d="M22 12a10 10 0 1 0-11.5 9.9v-7h-2.5V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.3 0-1.7.8-1.7 1.6V12h2.9l-.5 2.9h-2.4v7A10 10 0 0 0 22 12z"/>
+            </svg>
+          </a>
+          <a href="#" class="w-10 h-10 rounded-lg bg-white text-black flex items-center justify-center hover:brightness-95 transition" aria-label="Twitter">
+            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor" aria-hidden="true">
+              <path d="M22 5.8c-.7.3-1.5.6-2.3.7.8-.5 1.4-1.3 1.7-2.2-.8.5-1.7.9-2.6 1.1A3.7 3.7 0 0 0 12.8 7c0 .3 0 .7.1 1C9.2 7.8 6 6 4 3.3c-.4.6-.5 1.3-.5 2.1 0 1.3.6 2.4 1.6 3.1-.6 0-1.2-.2-1.7-.5v.1c0 1.9 1.3 3.4 3.1 3.8-.4.1-.8.1-1.3.1-.3 0-.6 0-.9-.1.6 1.7 2.2 2.9 4.1 2.9A7.5 7.5 0 0 1 2 19.5 10.7 10.7 0 0 0 7.8 21c6.9 0 10.7-5.9 10.7-11 0-.2 0-.4 0-.5.7-.5 1.3-1.2 1.8-2z"/>
+            </svg>
+          </a>
+          <a href="#" class="w-10 h-10 rounded-lg bg-white text-black flex items-center justify-center hover:brightness-95 transition" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor" aria-hidden="true">
+              <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm10 2H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3zm-5 4.5A3.5 3.5 0 1 1 8.5 12 3.5 3.5 0 0 1 12 8.5zm0 2A1.5 1.5 0 1 0 13.5 12 1.5 1.5 0 0 0 12 10.5zM17.8 6.2a1 1 0 1 1-1 1 1 1 0 0 1 1-1z"/>
+            </svg>
+          </a>
+          <a href="#" class="w-10 h-10 rounded-lg bg-white text-black flex items-center justify-center hover:brightness-95 transition" aria-label="YouTube">
+            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor" aria-hidden="true">
+              <path d="M21.8 8.1s-.2-1.5-.8-2.1c-.8-.8-1.7-.8-2.1-.9C16.1 4.8 12 4.8 12 4.8h0s-4.1 0-6.9.3c-.4 0-1.3.1-2.1.9-.6.6-.8 2.1-.8 2.1S1.9 9.9 1.9 11.7v.6c0 1.8.4 3.6.4 3.6s.2 1.5.8 2.1c.8.8 1.9.8 2.4.9 1.7.2 7.5.3 7.5.3s4.1 0 6.9-.3c.4 0 1.3-.1 2.1-.9.6-.6.8-2.1.8-2.1s.4-1.8.4-3.6v-.6c0-1.8-.4-3.6-.4-3.6zM10 15.5V8.5l6 3.5-6 3.5z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scroll to top button -->
+    <button id="toTopBtn" type="button"
+      class="fixed z-50 right-4 bottom-6 sm:right-6 sm:bottom-8 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white text-black flex items-center justify-center shadow-lg hover:brightness-95 transition"
+      aria-label="Scroll to top">
+      <svg viewBox="0 0 24 24" class="w-6 h-6" fill="currentColor" aria-hidden="true">
+        <path d="M12 4l-8 8h5v8h6v-8h5l-8-8z"/>
+      </svg>
+    </button>
+
+  </footer>
+
+  <script>
+    (function () {
+      const toTopBtn = document.getElementById('toTopBtn');
+      if (toTopBtn) toTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    })();
+  </script>
+</body>
+</html>
