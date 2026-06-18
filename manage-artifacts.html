@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="PAF_Seal.png">
+    <title>PAF Manage Artifacts</title>
+    <style>
+        #profileDropdown.show { display: block !important; }
+        .modal { display: none; opacity: 0; }
+        .modal.show { display: flex; animation: fadeIn 0.18s ease forwards; }
+        .modal > div { animation: slideUp 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(16px) scale(0.97); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+        nav { font-family: Arial, sans-serif !important; }
+        .loader { border: 2px solid #f3f3f3; border-top: 2px solid #3b82f6; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #toast { transform: translateX(300px); transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #toast.show { transform: translateX(0); opacity: 1; }
+        .section-card { transition: box-shadow 0.2s ease, transform 0.2s ease; }
+        .section-card:hover { box-shadow: 0 20px 40px -8px rgba(0,0,0,0.12); transform: translateY(-4px); }
+        button:active { transform: scale(0.97); }
+        select, input[type="text"], textarea { transition: border-color 0.15s, box-shadow 0.15s; }
+        select:focus, input[type="text"]:focus, textarea:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+    </style>
+</head>
+<body class="bg-[#F8FAFC] font-sans text-slate-800">
+    <nav class="bg-white border-b border-gray-100 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-2">
+             <div class="text-xs font-bold leading-tight">
+                <span class="text-orange-500">PAF</span> <span class="text-blue-900 italic">interactive</span><br>
+                <span class="text-red-600 text-sm tracking-tighter uppercase">Augmented Reality</span>
+             </div>
+        </div>
+        <div class="hidden md:flex items-center gap-6 font-semibold text-gray-500 text-sm">
+            <a href="dashboard.html" class="hover:text-blue-600 transition-colors">🏠 Dashboard</a>
+            <a href="time.html" class="hover:text-blue-600 transition-colors">👤 Time-in/Time-out</a>
+            <a href="news.html" class="hover:text-blue-600 transition-colors">📰 News/Updates</a>
+            <a href="manage.html" class="hover:text-blue-600 transition-colors">👥 Manage Users</a>
+            <a href="inventory.html" class="hover:text-blue-600 transition-colors">📦 Inventory</a>
+            <a href="manage-artifacts.html" class="text-blue-600 bg-blue-50 px-4 py-2 rounded-xl transition-all">🏛️ Manage Artifacts</a>
+            <a href="incidents.html" class="hover:text-blue-600 transition-colors">⚠️ Incident Report</a>
+        </div>
+        <div class="relative">
+            <div id="profileBtn" class="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100 cursor-pointer hover:bg-gray-200 transition-all">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=aug" alt="avatar" class="w-7 h-7 rounded-full bg-purple-500">
+                <span id="navAdminName" class="text-sm font-bold">Admin</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+            </div>
+            <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-[60] hidden">
+                <div class="px-4 py-2 border-b border-gray-50 mb-1">
+                    <p class="text-[10px] text-gray-400 uppercase font-bold">Admin Account</p>
+                    <p id="navAdminEmail" class="text-xs font-semibold truncate text-blue-900">admin@paf.com</p>
+                </div>
+                <button id="logoutBtn" class="w-full text-left px-4 py-2 text-sm text-red-600 font-bold hover:bg-red-50 transition-colors">Sign out</button>
+            </div>
+        </div>
+    </nav>
+
+    <header class="max-w-[1400px] mx-auto px-8 pt-10">
+        <h1 class="text-3xl font-black text-slate-900 tracking-tight italic uppercase">Manage Exhibits</h1>
+        <p class="text-gray-500 text-sm font-medium">Create exhibit sections (folders) and add artifacts to each section.</p>
+    </header>
+
+    <main class="max-w-[1400px] mx-auto p-8">
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm">
+                <p class="text-[10px] font-black uppercase text-gray-400 tracking-widest">Total Artifacts</p>
+                <h3 id="totalArtifacts" class="text-3xl font-black text-slate-900">0</h3>
+            </div>
+            <div class="bg-white p-5 rounded-3xl border border-amber-50 shadow-sm">
+                <p class="text-[10px] font-black uppercase text-amber-400 tracking-widest">On Exhibit</p>
+                <h3 id="onExhibitCount" class="text-3xl font-black text-amber-600">0</h3>
+            </div>
+            <div class="bg-white p-5 rounded-3xl border border-emerald-50 shadow-sm">
+                <p class="text-[10px] font-black uppercase text-emerald-400 tracking-widest">In Storage</p>
+                <h3 id="inStorageArtCount" class="text-3xl font-black text-emerald-600">0</h3>
+            </div>
+            <div class="bg-white p-5 rounded-3xl border border-blue-50 shadow-sm">
+                <p class="text-[10px] font-black uppercase text-blue-400 tracking-widest">Sections</p>
+                <h3 id="categoriesCount" class="text-3xl font-black text-blue-600">0</h3>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="relative flex-1 w-full">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2">🔍</span>
+                <input type="text" id="artifactSearch" placeholder="Search artifact name or section..." class="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-semibold outline-none focus:ring-4 focus:ring-blue-500/5">
+            </div>
+            <div class="flex gap-2 w-full md:w-auto">
+                <button onclick="openAddSectionModal()" class="flex-1 md:flex-none bg-white border-2 border-blue-200 text-blue-600 px-6 py-3 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-blue-50 transition-all shadow-sm flex items-center gap-2">
+                    <span>📁</span> New Section
+                </button>
+                <button onclick="openAddArtifactModal()" class="flex-1 md:flex-none bg-blue-600 text-white px-8 py-3 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex items-center gap-2">
+                    <span>➕</span> Add Artifact
+                </button>
+            </div>
+        </div>
+
+        <!-- Sections Grid -->
+        <div id="sectionsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-10"></div>
+
+        <!-- Artifact Table -->
+        <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-gray-50/50 text-gray-400 font-black uppercase text-[10px] tracking-widest border-b border-gray-100">
+                    <tr>
+                        <th class="px-8 py-5">Thumbnail</th>
+                        <th class="px-6 py-5">Artifact Name</th>
+                        <th class="px-6 py-5">Section</th>
+                        <th class="px-6 py-5">Date Added</th>
+                        <th class="px-6 py-5">Status</th>
+                        <th class="px-8 py-5 text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="artifactTableBody" class="divide-y divide-gray-50">
+                    <tr><td colspan="6" class="px-6 py-20 text-center text-gray-400 font-bold italic">Loading artifacts...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- ADD/EDIT SECTION MODAL -->
+    <div id="sectionModal" class="modal fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h2 id="sectionModalTitle" class="text-xl font-black text-slate-900 uppercase italic">New Section</h2>
+                <button onclick="closeModal('sectionModal')" class="text-gray-400 hover:text-red-500 transition-colors">✕</button>
+            </div>
+            <form id="sectionForm" class="p-6 space-y-4">
+                <input type="hidden" id="editSectionId">
+                <div>
+                    <input type="file" id="sectionImageUpload" accept="image/*" class="hidden" />
+                    <label for="sectionImageUpload" class="cursor-pointer border-2 border-dashed border-gray-200 rounded-2xl aspect-video flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 hover:border-blue-300 transition-all overflow-hidden group">
+                        <img id="sectionImagePreview" class="hidden w-full h-full object-cover">
+                        <div id="sectionImagePlaceholder" class="text-center space-y-2">
+                            <div class="bg-white p-3 rounded-xl shadow-sm inline-block text-gray-400 group-hover:text-blue-500 transition-colors">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            </div>
+                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest">Click to upload section cover image</p>
+                        </div>
+                    </label>
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1 block">Section Name</label>
+                    <input type="text" id="sectionNameInput" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-bold text-sm" placeholder="e.g. Hall of Heroes">
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1 block">Description</label>
+                    <textarea id="sectionDescInput" rows="2" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none text-sm leading-relaxed resize-none" placeholder="Brief description of this section..."></textarea>
+                </div>
+                <button type="submit" id="saveSectionBtn" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex items-center justify-center gap-2">
+                    <span id="saveSectionText">Create Section</span>
+                    <div id="saveSectionLoader" class="loader hidden"></div>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ADD/EDIT ARTIFACT MODAL -->
+    <div id="addArtifactModal" class="modal fixed inset-0 bg-black/60 backdrop-blur-sm z-[120] items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl max-h-[95vh] flex flex-col">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
+                <h2 id="artifactModalTitle" class="text-xl font-black text-slate-900 uppercase italic">Add Artifact</h2>
+                <button onclick="closeAddModal()" class="text-gray-400 hover:text-red-500 transition-colors">✕</button>
+            </div>
+            <form id="artifactForm" class="p-6 md:p-8 space-y-4 overflow-y-auto">
+                <input type="hidden" id="artifactId">
+                <div>
+                    <input type="file" id="artifactImageUpload" accept="image/*" class="hidden" />
+                    <label for="artifactImageUpload" class="cursor-pointer border-2 border-dashed border-gray-200 rounded-2xl aspect-video flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 hover:border-blue-300 transition-all overflow-hidden group">
+                        <img id="artifactImagePreview" class="hidden w-full h-full object-cover">
+                        <div id="artifactImagePlaceholder" class="text-center space-y-2">
+                            <div class="bg-white p-3 rounded-xl shadow-sm inline-block text-gray-400 group-hover:text-blue-500 transition-colors">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            </div>
+                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest">Click to upload thumbnail</p>
+                        </div>
+                    </label>
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1 block">Artifact Name</label>
+                    <input type="text" id="artifactName" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-bold text-sm" placeholder="e.g. Vintage Pilot Helmet">
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1 block">Description</label>
+                    <textarea id="artifactDescription" rows="3" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none text-sm leading-relaxed resize-none" placeholder="Brief description..."></textarea>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1 block">Belongs to Section</label>
+                        <select id="artifactCategory" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-bold text-sm">
+                            <option value="">-- Select Section --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1 block">Status</label>
+                        <select id="artifactStatus" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-bold text-sm">
+                            <option value="On Exhibit">On Exhibit</option>
+                            <option value="In Storage">In Storage</option>
+                            <option value="Under Maintenance">Under Maintenance</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" id="submitArtifactBtn" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex items-center justify-center gap-2">
+                    <span id="submitArtifactText">Add Artifact</span>
+                    <div id="submitArtifactLoader" class="loader hidden"></div>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ARTIFACT DETAILS MODAL -->
+    <div id="detailsModal" class="modal fixed inset-0 bg-black/60 backdrop-blur-sm z-[130] items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl">
+            <div class="relative h-64 bg-gray-100">
+                <img id="detailsArtifactImage" src="" alt="Artifact Image" class="w-full h-full object-cover">
+                <button onclick="closeModal('detailsModal')" class="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors">✕</button>
+            </div>
+            <div class="p-6 space-y-4">
+                <h3 id="detailsArtifactName" class="text-2xl font-black text-slate-900 uppercase italic"></h3>
+                <p id="detailsArtifactDescription" class="text-slate-600 leading-relaxed font-normal text-sm"></p>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div><p class="text-[10px] font-black uppercase text-gray-400">Section</p><p id="detailsArtifactCategory" class="font-bold text-slate-700"></p></div>
+                    <div><p class="text-[10px] font-black uppercase text-gray-400">Date Added</p><p id="detailsArtifactDate" class="font-bold text-slate-700"></p></div>
+                    <div><p class="text-[10px] font-black uppercase text-gray-400">Status</p><p id="detailsArtifactStatus" class="font-bold text-slate-700"></p></div>
+                    <div><p class="text-[10px] font-black uppercase text-gray-400">Added By</p><p id="detailsArtifactAddedBy" class="font-bold text-slate-700"></p></div>
+                </div>
+            </div>
+            <div class="p-6 border-t border-gray-100 flex justify-end gap-2">
+                <button id="editArtifactFromDetailsBtn" onclick="openEditFromDetails()" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-blue-700 transition-all">Edit</button>
+                <button onclick="closeModal('detailsModal')" class="bg-gray-200 text-slate-700 px-6 py-3 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-gray-300 transition-all">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DELETE ARTIFACT CONFIRMATION -->
+    <div id="deleteConfirmModal" class="modal fixed inset-0 bg-black/60 z-[140] items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl text-center">
+            <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">🗑️</div>
+            <h3 class="text-lg font-black text-slate-900">Delete?</h3>
+            <p class="text-gray-500 text-xs mt-1">Remove "<span id="deleteTargetName" class="font-bold text-slate-800"></span>" permanently?</p>
+            <p class="text-red-500 text-[10px] font-bold mt-2">This action cannot be undone.</p>
+            <div class="grid grid-cols-2 gap-2 mt-6">
+                <button onclick="closeModal('deleteConfirmModal')" class="bg-gray-100 text-slate-700 py-2.5 rounded-lg text-sm font-bold hover:bg-gray-200 transition-colors">Cancel</button>
+                <button id="finalDeleteBtn" class="bg-red-600 text-white py-2.5 rounded-lg text-sm font-bold hover:bg-red-700 transition-colors">Confirm Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DELETE SECTION CONFIRMATION -->
+    <div id="deleteSectionConfirmModal" class="modal fixed inset-0 bg-black/60 z-[140] items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl text-center">
+            <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">📁</div>
+            <h3 class="text-lg font-black text-slate-900">Delete Section?</h3>
+            <p class="text-gray-500 text-xs mt-1">Remove section "<span id="deleteSectionName" class="font-bold text-slate-800"></span>"? All artifacts in this section will also be deleted.</p>
+            <p class="text-red-500 text-[10px] font-bold mt-2">This action cannot be undone.</p>
+            <div class="grid grid-cols-2 gap-2 mt-6">
+                <button onclick="closeModal('deleteSectionConfirmModal')" class="bg-gray-100 text-slate-700 py-2.5 rounded-lg text-sm font-bold hover:bg-gray-200 transition-colors">Cancel</button>
+                <button id="finalDeleteSectionBtn" class="bg-red-600 text-white py-2.5 rounded-lg text-sm font-bold hover:bg-red-700 transition-colors">Delete Section & Artifacts</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed top-6 right-6 z-[200] opacity-0 flex items-center gap-2 bg-white border border-emerald-100 text-emerald-700 px-4 py-3 rounded-xl shadow-xl pointer-events-none">
+        <span class="bg-emerald-500 text-white rounded-full p-1 text-xs">✓</span>
+        <p id="toastMsg" class="text-sm font-bold">Done!</p>
+    </div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp, doc, getDocs, where, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyArXdGOgHeeoX2iqegUvpg5l-eF02SUE-Y",
+    authDomain: "paf06-7d7cb.firebaseapp.com",
+    projectId: "paf06-7d7cb",
+    storageBucket: "paf06-7d7cb.firebasestorage.app",
+    messagingSenderId: "661740924808",
+    appId: "1:661740924808:web:6b00c1341f34e9eb81143d"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const cloudName = "duzlklts9";
+
+let currentEditArtifactId = null;
+let existingArtifactImageUrl = "";
+let adminName = "Admin";
+let allArtifactsData = [];
+let allSections = [];
+
+// --- AUTH ---
+onAuthStateChanged(auth, (user) => {
+    if (!user) window.location.href = "index.html";
+    else {
+        adminName = user.email.split('@')[0];
+        document.getElementById('navAdminName').innerText = adminName;
+        document.getElementById('navAdminEmail').innerText = user.email;
+    }
+});
+document.getElementById('profileBtn').onclick = (e) => {
+    e.stopPropagation();
+    document.getElementById('profileDropdown').classList.toggle('show');
+};
+window.onclick = () => document.getElementById('profileDropdown').classList.remove('show');
+document.getElementById('logoutBtn').onclick = () => signOut(auth);
+
+// --- TOAST ---
+function showToast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    t.className = `fixed top-6 right-6 z-[200] opacity-0 flex items-center gap-2 bg-white border ${isError ? 'border-red-100 text-red-700' : 'border-emerald-100 text-emerald-700'} px-4 py-3 rounded-xl shadow-xl pointer-events-none`;
+    t.querySelector('span').className = `${isError ? 'bg-red-500' : 'bg-emerald-500'} text-white rounded-full p-1 text-xs`;
+    t.querySelector('span').textContent = isError ? '✕' : '✓';
+    document.getElementById('toastMsg').innerText = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// --- MODALS ---
+window.openModal = (id) => document.getElementById(id).classList.add('show');
+window.closeModal = (id) => document.getElementById(id).classList.remove('show');
+
+// =====================
+// HELPERS
+// =====================
+
+function populateSectionDropdown() {
+    const select = document.getElementById('artifactCategory');
+    const currentVal = select.value;
+    select.innerHTML = '<option value="">-- Select Section --</option>';
+    allSections.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.name;
+        opt.textContent = s.name;
+        select.appendChild(opt);
+    });
+    if (currentVal) select.value = currentVal;
+}
+
+function renderSectionsGrid() {
+    const grid = document.getElementById('sectionsGrid');
+    if (allSections.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-400"><div class="text-5xl mb-4">📁</div><p class="font-bold italic">No sections yet. Click "New Section" to create your first exhibit folder.</p></div>`;
+        return;
+    }
+    grid.innerHTML = allSections.map(s => {
+        const count = allArtifactsData.filter(a => a.category === s.name).length;
+        const safeName = s.name.replace(/'/g, "\\'");
+        return `<div class="bg-white rounded-3xl border border-gray-100 shadow-sm section-card overflow-hidden group cursor-pointer" onclick="viewSection('${safeName}')">
+            <div class="aspect-video overflow-hidden bg-gray-100 relative">
+                <img src="${s.imageUrl || 'https://images.unsplash.com/photo-1581265231392-9db3a7a5e392?w=400&h=250&fit=crop'}" alt="${s.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <div class="absolute bottom-3 left-3 right-3">
+                    <h3 class="text-white font-black uppercase text-sm tracking-tight drop-shadow-lg">${s.name}</h3>
+                    <p class="text-white/80 text-[10px] font-bold">${count} artifact${count !== 1 ? 's' : ''}</p>
+                </div>
+            </div>
+            <div class="p-3 flex justify-end gap-1">
+                <button onclick="event.stopPropagation(); editSection('${s.id}')" class="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-600 hover:text-white transition-all text-[10px]" title="Edit Section">✏️</button>
+                <button onclick="event.stopPropagation(); confirmDeleteSection('${s.id}', '${safeName}')" class="p-1.5 bg-red-50 text-red-500 rounded-lg hover:bg-red-600 hover:text-white transition-all text-[10px]" title="Delete Section">🗑️</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+window.viewSection = (name) => {
+    window.open(`exhibits-section.html?section=${encodeURIComponent(name)}`, '_blank');
+};
+
+// =====================
+// SECTIONS — Firestore listener
+// =====================
+onSnapshot(query(collection(db, "exhibitSections"), orderBy("createdAt", "desc")), (snapshot) => {
+    allSections = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    populateSectionDropdown();
+    document.getElementById('categoriesCount').innerText = allSections.length;
+    renderSectionsGrid();
+});
+
+// --- Section image preview ---
+const sectionImageUpload = document.getElementById('sectionImageUpload');
+const sectionImagePreview = document.getElementById('sectionImagePreview');
+const sectionImagePlaceholder = document.getElementById('sectionImagePlaceholder');
+sectionImageUpload.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+        sectionImagePreview.src = ev.target.result;
+        sectionImagePreview.classList.remove('hidden');
+        sectionImagePlaceholder.classList.add('hidden');
+    };
+    reader.readAsDataURL(file);
+};
+
+window.openAddSectionModal = () => {
+    document.getElementById('editSectionId').value = '';
+    document.getElementById('sectionForm').reset();
+    document.getElementById('sectionModalTitle').innerText = 'New Section';
+    document.getElementById('saveSectionText').innerText = 'Create Section';
+    sectionImagePreview.classList.add('hidden');
+    sectionImagePlaceholder.classList.remove('hidden');
+    sectionImageUpload.value = '';
+    openModal('sectionModal');
+};
+
+window.editSection = (id) => {
+    const s = allSections.find(sec => sec.id === id);
+    if (!s) return;
+    document.getElementById('editSectionId').value = id;
+    document.getElementById('sectionNameInput').value = s.name;
+    document.getElementById('sectionDescInput').value = s.description || '';
+    document.getElementById('sectionModalTitle').innerText = 'Edit Section';
+    document.getElementById('saveSectionText').innerText = 'Update Section';
+    if (s.imageUrl) {
+        sectionImagePreview.src = s.imageUrl;
+        sectionImagePreview.classList.remove('hidden');
+        sectionImagePlaceholder.classList.add('hidden');
+    } else {
+        sectionImagePreview.classList.add('hidden');
+        sectionImagePlaceholder.classList.remove('hidden');
+    }
+    openModal('sectionModal');
+};
+
+window.confirmDeleteSection = (id, name) => {
+    document.getElementById('deleteSectionName').innerText = name;
+    document.getElementById('finalDeleteSectionBtn').dataset.id = id;
+    openModal('deleteSectionConfirmModal');
+};
+
+document.getElementById('finalDeleteSectionBtn').onclick = async () => {
+    const id = document.getElementById('finalDeleteSectionBtn').dataset.id;
+    const section = allSections.find(s => s.id === id);
+    if (!section) return;
+    const btn = document.getElementById('finalDeleteSectionBtn');
+    btn.disabled = true;
+    btn.innerText = 'Deleting...';
+    try {
+        const q = query(collection(db, "artifacts"), where("category", "==", section.name));
+        const snap = await getDocs(q);
+        // Use writeBatch for parallel deletes (much faster than sequential)
+        const batch = writeBatch(db);
+        snap.docs.forEach(d => batch.delete(doc(db, "artifacts", d.id)));
+        batch.delete(doc(db, "exhibitSections", id));
+        await batch.commit();
+        showToast(`Section "${section.name}" deleted!`);
+        closeModal('deleteSectionConfirmModal');
+    } catch (err) {
+        showToast("Error deleting section.", true);
+    } finally {
+        btn.disabled = false;
+        btn.innerText = 'Delete Section & Artifacts';
+    }
+};
+
+// --- Cloudinary upload helper ---
+async function uploadToCloudinary(file) {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', 'ml_default');
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: 'POST', body: fd });
+    if (!res.ok) throw new Error('Image upload failed');
+    const data = await res.json();
+    return data.secure_url;
+}
+
+// --- Section form submit ---
+document.getElementById('sectionForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const editId = document.getElementById('editSectionId').value;
+    const name = document.getElementById('sectionNameInput').value.trim();
+    const desc = document.getElementById('sectionDescInput').value.trim();
+    const btn = document.getElementById('saveSectionBtn');
+    const loader = document.getElementById('saveSectionLoader');
+    const btnText = document.getElementById('saveSectionText');
+
+    if (!name) return;
+    btn.disabled = true;
+    loader.classList.remove('hidden');
+    btnText.innerText = editId ? 'Updating...' : 'Creating...';
+
+    try {
+        // Only upload if a NEW file was selected
+        let finalImageUrl = editId ? (allSections.find(s => s.id === editId)?.imageUrl || '') : '';
+        if (sectionImageUpload.files[0]) {
+            btnText.innerText = 'Uploading image...';
+            finalImageUrl = await uploadToCloudinary(sectionImageUpload.files[0]);
+        }
+
+        const payload = { name, description: desc, imageUrl: finalImageUrl };
+        if (editId) {
+            await updateDoc(doc(db, "exhibitSections", editId), payload);
+            showToast("Section updated!");
+        } else {
+            await addDoc(collection(db, "exhibitSections"), { ...payload, createdAt: serverTimestamp() });
+            showToast("Section created!");
+        }
+
+        closeModal('sectionModal');
+        document.getElementById('sectionForm').reset();
+        sectionImagePreview.classList.add('hidden');
+        sectionImagePlaceholder.classList.remove('hidden');
+        sectionImageUpload.value = '';
+    } catch (err) {
+        showToast("Error: " + err.message, true);
+    } finally {
+        btn.disabled = false;
+        loader.classList.add('hidden');
+        btnText.innerText = editId ? 'Update Section' : 'Create Section';
+    }
+};
+
+// =====================
+// ARTIFACTS
+// =====================
+
+const artifactImageUpload = document.getElementById('artifactImageUpload');
+const artifactImagePreview = document.getElementById('artifactImagePreview');
+const artifactImagePlaceholder = document.getElementById('artifactImagePlaceholder');
+artifactImageUpload.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+        artifactImagePreview.src = ev.target.result;
+        artifactImagePreview.classList.remove('hidden');
+        artifactImagePlaceholder.classList.add('hidden');
+    };
+    reader.readAsDataURL(file);
+};
+
+window.openAddArtifactModal = () => {
+    currentEditArtifactId = null;
+    existingArtifactImageUrl = "";
+    document.getElementById('artifactForm').reset();
+    document.getElementById('artifactModalTitle').innerText = "Add Artifact";
+    document.getElementById('submitArtifactText').innerText = "Add Artifact";
+    artifactImagePreview.classList.add('hidden');
+    artifactImagePlaceholder.classList.remove('hidden');
+    artifactImageUpload.value = '';
+    populateSectionDropdown();
+    openModal('addArtifactModal');
+};
+
+window.openEditArtifactModal = (id) => {
+    const artifact = allArtifactsData.find(a => a.id === id);
+    if (!artifact) return;
+    currentEditArtifactId = id;
+    existingArtifactImageUrl = artifact.imageUrl || "";
+    document.getElementById('artifactModalTitle').innerText = "Edit Artifact";
+    document.getElementById('submitArtifactText').innerText = "Update Artifact";
+    document.getElementById('artifactId').value = id;
+    document.getElementById('artifactName').value = artifact.artifactName;
+    document.getElementById('artifactDescription').value = artifact.description;
+    document.getElementById('artifactStatus').value = artifact.status;
+    populateSectionDropdown();
+    document.getElementById('artifactCategory').value = artifact.category || '';
+    if (artifact.imageUrl) {
+        artifactImagePreview.src = artifact.imageUrl;
+        artifactImagePreview.classList.remove('hidden');
+        artifactImagePlaceholder.classList.add('hidden');
+    } else {
+        artifactImagePreview.classList.add('hidden');
+        artifactImagePlaceholder.classList.remove('hidden');
+    }
+    openModal('addArtifactModal');
+};
+
+window.closeAddModal = () => {
+    closeModal('addArtifactModal');
+    document.getElementById('artifactForm').reset();
+    artifactImagePreview.classList.add('hidden');
+    artifactImagePlaceholder.classList.remove('hidden');
+    artifactImageUpload.value = '';
+};
+
+window.openEditFromDetails = () => {
+    closeModal('detailsModal');
+    openEditArtifactModal(currentEditArtifactId);
+};
+
+// --- Artifact form submit ---
+document.getElementById('artifactForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('submitArtifactBtn');
+    const loader = document.getElementById('submitArtifactLoader');
+    const btnText = document.getElementById('submitArtifactText');
+    const section = document.getElementById('artifactCategory').value;
+
+    if (!section) { showToast("Please select a section.", true); return; }
+    if (!currentEditArtifactId && !existingArtifactImageUrl && !artifactImageUpload.files[0]) {
+        showToast("Please upload a thumbnail image.", true);
+        return;
+    }
+
+    btn.disabled = true;
+    loader.classList.remove('hidden');
+    btnText.innerText = currentEditArtifactId ? "Updating..." : "Adding...";
+
+    try {
+        let finalImageUrl = existingArtifactImageUrl;
+        if (artifactImageUpload.files[0]) {
+            btnText.innerText = 'Uploading image...';
+            finalImageUrl = await uploadToCloudinary(artifactImageUpload.files[0]);
+        }
+
+        const artifactData = {
+            artifactName: document.getElementById('artifactName').value,
+            description: document.getElementById('artifactDescription').value,
+            category: section,
+            status: document.getElementById('artifactStatus').value,
+            imageUrl: finalImageUrl,
+            addedBy: adminName,
+            timestamp: serverTimestamp()
+        };
+
+        if (currentEditArtifactId) {
+            await updateDoc(doc(db, "artifacts", currentEditArtifactId), artifactData);
+            showToast("Artifact updated!");
+        } else {
+            await addDoc(collection(db, "artifacts"), artifactData);
+            showToast(`Artifact added to "${section}" section!`);
+        }
+        closeAddModal();
+    } catch (err) {
+        showToast("Error: " + err.message, true);
+    } finally {
+        btn.disabled = false;
+        loader.classList.add('hidden');
+        btnText.innerText = currentEditArtifactId ? "Update Artifact" : "Add Artifact";
+    }
+};
+
+// --- Delete artifact ---
+let artifactToDeleteId = null;
+window.confirmDeleteArtifact = (id, name) => {
+    artifactToDeleteId = id;
+    document.getElementById('deleteTargetName').innerText = name;
+    openModal('deleteConfirmModal');
+};
+document.getElementById('finalDeleteBtn').onclick = async () => {
+    if (!artifactToDeleteId) return;
+    try {
+        await deleteDoc(doc(db, "artifacts", artifactToDeleteId));
+        showToast("Artifact deleted!");
+        closeModal('deleteConfirmModal');
+        artifactToDeleteId = null;
+    } catch (err) {
+        showToast("Error deleting artifact.", true);
+    }
+};
+
+// --- Artifact details modal ---
+window.openArtifactDetailsModal = (id) => {
+    const artifact = allArtifactsData.find(a => a.id === id);
+    if (!artifact) return;
+    currentEditArtifactId = id;
+    document.getElementById('detailsArtifactImage').src = artifact.imageUrl || 'https://via.placeholder.com/400x200?text=No+Image';
+    document.getElementById('detailsArtifactName').innerText = artifact.artifactName;
+    document.getElementById('detailsArtifactDescription').innerText = artifact.description;
+    document.getElementById('detailsArtifactCategory').innerText = artifact.category || 'Uncategorized';
+    document.getElementById('detailsArtifactStatus').innerText = artifact.status;
+    document.getElementById('detailsArtifactAddedBy').innerText = artifact.addedBy || 'Admin';
+    const date = artifact.timestamp ? artifact.timestamp.toDate().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'N/A';
+    document.getElementById('detailsArtifactDate').innerText = date;
+    openModal('detailsModal');
+};
+
+// --- Table row builder ---
+function buildArtifactRow(id, data) {
+    const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Just now';
+    let sc = "text-amber-600 bg-amber-50";
+    if (data.status === "In Storage") sc = "text-emerald-600 bg-emerald-50";
+    if (data.status === "Under Maintenance") sc = "text-blue-600 bg-blue-50";
+    const safeName = (data.artifactName || '').replace(/'/g, "\\'");
+    return `<tr class="hover:bg-gray-50/50 transition-colors">
+        <td class="px-8 py-5"><img src="${data.imageUrl || 'https://via.placeholder.com/50?text=No+Img'}" class="w-14 h-14 object-cover rounded-xl border border-gray-100 shadow-sm"></td>
+        <td class="px-6 py-5 font-black text-slate-700">${data.artifactName}</td>
+        <td class="px-6 py-5"><span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg uppercase">${data.category || 'Uncategorized'}</span></td>
+        <td class="px-6 py-5 text-gray-400 text-xs font-bold italic">${date}</td>
+        <td class="px-6 py-5"><span class="px-3 py-1 rounded-full text-[10px] font-black uppercase italic ${sc}">${data.status}</span></td>
+        <td class="px-8 py-5 text-right"><div class="flex justify-end gap-2">
+            <button onclick="openArtifactDetailsModal('${id}')" class="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-all">👁️</button>
+            <button onclick="openEditArtifactModal('${id}')" class="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-600 hover:text-white transition-all">✏️</button>
+            <button onclick="confirmDeleteArtifact('${id}', '${safeName}')" class="p-2 bg-gray-50 text-gray-400 rounded-lg hover:bg-red-600 hover:text-white transition-all">🗑️</button>
+        </div></td>
+    </tr>`;
+}
+
+// --- Real-time artifact listener ---
+onSnapshot(query(collection(db, "artifacts"), orderBy("timestamp", "desc")), (snapshot) => {
+    const tableBody = document.getElementById('artifactTableBody');
+    let total = 0, onExhibit = 0, inStorage = 0;
+    allArtifactsData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    if (snapshot.empty) {
+        tableBody.innerHTML = '<tr><td colspan="6" class="px-6 py-20 text-center text-gray-400 font-bold italic">No artifacts added yet.</td></tr>';
+    } else {
+        tableBody.innerHTML = snapshot.docs.map(docSnap => {
+            const data = docSnap.data();
+            total++;
+            if (data.status === "On Exhibit") onExhibit++;
+            if (data.status === "In Storage") inStorage++;
+            return buildArtifactRow(docSnap.id, data);
+        }).join('');
+    }
+
+    document.getElementById('totalArtifacts').innerText = total;
+    document.getElementById('onExhibitCount').innerText = onExhibit;
+    document.getElementById('inStorageArtCount').innerText = inStorage;
+    renderSectionsGrid();
+});
+
+// --- Search (debounced 200ms) ---
+let searchTimer = null;
+document.getElementById('artifactSearch').addEventListener('input', (e) => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+        const term = e.target.value.toLowerCase().trim();
+        const tableBody = document.getElementById('artifactTableBody');
+        if (!term) {
+            // Show all without re-querying Firestore
+            tableBody.innerHTML = allArtifactsData.map(a => buildArtifactRow(a.id, a)).join('') || '<tr><td colspan="6" class="px-6 py-20 text-center text-gray-400 font-bold italic">No artifacts added yet.</td></tr>';
+            return;
+        }
+        const filtered = allArtifactsData.filter(a =>
+            (a.artifactName || '').toLowerCase().includes(term) ||
+            (a.category || '').toLowerCase().includes(term)
+        );
+        if (filtered.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="6" class="px-6 py-20 text-center text-gray-400 font-bold italic">No matching artifacts.</td></tr>';
+        } else {
+            tableBody.innerHTML = filtered.map(a => buildArtifactRow(a.id, a)).join('');
+        }
+    }, 200);
+});
+</script>
+</body>
+</html>

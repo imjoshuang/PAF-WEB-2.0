@@ -8,6 +8,7 @@
     <link rel="icon" type="image/png" href="PAF_Seal.png">
     <title>PAF AR Login</title>
     <style>
+        /* 100% Accurate Custom Styling para sa Toast */
         .toastify {
             padding: 12px 24px;
             color: #ffffff;
@@ -110,12 +111,13 @@
 
         const AUTHORIZED_ADMIN = "admin_paf@gmail.com"; 
 
+        // Toast Helper Function
         function showNotification(text, isSuccess) {
             Toastify({
                 text: text,
                 duration: 3000,
-                gravity: "top",
-                position: "right",
+                gravity: "top", // top or bottom
+                position: "right", // left, center or right
                 className: isSuccess ? "toast-success" : "toast-error",
                 stopOnFocus: true,
             }).showToast();
@@ -142,6 +144,7 @@
                 
                 showNotification("Login Successful! Welcome, Admin.", true);
                 
+                // Delay ng konti para makita ang success toast bago mag redirect
                 setTimeout(() => {
                     window.location.href = "dashboard.html"; 
                 }, 1500);

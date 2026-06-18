@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -33,7 +33,7 @@
       </button>
 
       <!-- Logo -->
-      <a href="paf-hero.html" class="flex items-center gap-3 flex-1 lg:flex-none justify-center lg:min-w-0 hover:opacity-80 transition-opacity">
+      <a href="index.html" class="flex items-center gap-3 flex-1 lg:flex-none justify-center lg:min-w-0 hover:opacity-80 transition-opacity">
         <img src="PAF_Seal.png" alt="PAF Seal" class="w-10 h-10 object-contain" />
         <div class="leading-tight hidden sm:block">
           <div class="text-[10px] font-black tracking-widest uppercase">PAF</div>
@@ -61,9 +61,13 @@
           <span>News & Events</span>
         </a>
 
-        <a href="#" class="flex items-center gap-2 border-b-2 border-transparent hover:border-[#FCD116] transition-all py-1">
+        <a href="exhibits.html" class="flex items-center gap-2 border-b-2 border-transparent hover:border-[#FCD116] transition-all py-1">
           EXHIBITIONS
           <svg class="chev" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M5 7l5 6 5-6H5z" /></svg>
+        </a>
+
+        <a href="paf-hero.html" class="flex items-center gap-2 border-b-2 border-transparent hover:border-[#FCD116] transition-all py-1">
+          <span>Login</span>
         </a>
 
       </div>
@@ -78,7 +82,7 @@
     <!-- Sidebar Content -->
     <div id="mobileMenuContent" class="absolute inset-y-0 left-0 w-72 bg-[#0038A8] text-white p-6 shadow-2xl flex flex-col transform -translate-x-full transition-transform duration-300 ease-in-out border-r border-white/10">
       <div class="flex items-center justify-between mb-10">
-        <a href="paf-hero.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+        <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
           <img src="PAF_Seal.png" alt="PAF Seal" class="w-10 h-10 object-contain" />
           <div class="leading-tight">
             <div class="text-[10px] font-black tracking-widest uppercase">PAF</div>
@@ -108,6 +112,7 @@
         </div>
         <a href="news-events.html" class="font-medium text-lg tracking-wide hover:text-[#FCD116] transition-colors uppercase">NEWS & EVENTS</a>
         <a href="#" class="font-medium text-lg tracking-wide hover:text-[#FCD116] transition-colors uppercase">EXHIBITIONS</a>
+        <a href="paf-hero.html" class="font-medium text-lg tracking-wide hover:text-[#FCD116] transition-colors uppercase">LOGIN</a>
       </nav>
     </div>
   </div>
@@ -353,7 +358,7 @@
       // Previous Button
       html += `
         <button onclick="window.changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="px-4 py-2 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all ${currentPage === 1 ? 'text-slate-300 cursor-not-allowed' : 'text-[#0038A8] hover:bg-blue-50'}">
-          ← Prev
+          â† Prev
         </button>
       `;
 
@@ -369,7 +374,7 @@
       // Next Button
       html += `
         <button onclick="window.changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="px-4 py-2 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all ${currentPage === totalPages ? 'text-slate-300 cursor-not-allowed' : 'text-[#0038A8] hover:bg-blue-50'}">
-          Next →
+          Next â†’
         </button>
       `;
 
@@ -410,7 +415,7 @@
               <p class="text-sm font-medium text-slate-500 leading-relaxed line-clamp-3 mb-6">${data.description || ''}</p>
               <div class="pt-4 border-t border-gray-50">
                 <a href="#" class="inline-flex items-center text-xs font-black text-[#C46200] uppercase tracking-widest hover:gap-2 transition-all">
-                  Read Full Article <span class="ml-1">→</span>
+                  Read Full Article <span class="ml-1">â†’</span>
                 </a>
               </div>
             </div>
