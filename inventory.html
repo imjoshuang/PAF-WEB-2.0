@@ -9,6 +9,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link rel="icon" type="image/png" href="PAF_Seal.png">
     <title>PAF Inventory Management</title>
+    <script>
+        // Session guard — bawal bumalik pag naka-logout na
+        if (localStorage.getItem('paf_admin_session') !== 'active') {
+            window.location.replace("paf-hero.html");
+        }
+    </script>
     <style>
         #profileDropdown.show { display: block !important; }
         .loader { border: 2px solid #f3f3f3; border-top: 2px solid #3b82f6; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; }

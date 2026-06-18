@@ -8,9 +8,25 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <link rel="icon" type="image/png" href="PAF_Seal.png">
     <title>PAF Incident Reports</title>
+    <script>
+        // Session guard — bawal bumalik pag naka-logout na
+        if (localStorage.getItem('paf_admin_session') !== 'active') {
+            window.location.replace("paf-hero.html");
+        }
+
+        // Prevent back navigation after logout
+        history.pushState(null, '', location.href);
+        window.addEventListener('popstate', () => {
+            if (localStorage.getItem('paf_admin_session') !== 'active') {
+                window.location.replace("paf-hero.html");
+            } else {
+                history.pushState(null, '', location.href);
+            }
+        });
+    </script>
     <style>
-        #profileDropdown, #addIncidentModal, #detailsModal { display: none; }
-        #profileDropdown.show, #addIncidentModal.show, #detailsModal.show { display: flex; }
+        #addIncidentModal, #detailsModal { display: none; }
+        #addIncidentModal.show, #detailsModal.show { display: flex; }
         nav { font-family: Arial, sans-serif !important; }
         .loader { border: 2px solid #f3f3f3; border-top: 2px solid #3b82f6; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -177,11 +193,13 @@
         const db = getFirestore(app);
 
         let adminName = "Admin";
-        let allIncidentsData = []; // Store for PDF generation
+        let allIncidentsData = [];
 
         onAuthStateChanged(auth, (user) => {
-            if (!user) window.location.href = "index.html";
-            else {
+            if (!user) {
+                localStorage.removeItem('paf_admin_session');
+                window.location.replace("index.html");
+            } else {
                 adminName = user.email.split('@')[0];
                 document.getElementById('navAdminName').innerText = adminName;
                 document.getElementById('navAdminEmail').innerText = user.email;
@@ -201,7 +219,18 @@
             document.getElementById('profileDropdown').classList.toggle('hidden');
         };
         window.onclick = () => document.getElementById('profileDropdown').classList.add('hidden');
-        document.getElementById('logoutBtn').onclick = () => signOut(auth);
+
+        // --- LOGOUT: clear session + replace history so back button won't work ---
+        document.getElementById('logoutBtn').onclick = async () => {
+            try {
+                await signOut(auth);
+            } catch (e) {
+                console.error("Logout error:", e);
+            } finally {
+                localStorage.removeItem('paf_admin_session');
+                window.location.replace("paf-hero.html");
+            }
+        };
 
         // --- FORM SUBMISSION ---
         const incidentForm = document.getElementById('incidentForm');
@@ -283,7 +312,6 @@
                 }).join('');
             }
 
-            // Update stats
             document.getElementById('totalIncidents').innerText = total;
             document.getElementById('missingCount').innerText = missing;
             document.getElementById('investigatingCount').innerText = investigating;
@@ -321,7 +349,7 @@
                 body: data,
                 startY: 45,
                 theme: 'striped',
-                headStyles: { fillColor: [30, 58, 138] }, // Navy Blue theme
+                headStyles: { fillColor: [30, 58, 138] },
                 margin: { top: 45 }
             });
 
@@ -329,13 +357,13 @@
         };
 
         window.updateStatus = async (id, status) => {
-            if(confirm(`Mark this incident as ${status}?`)) {
+            if (confirm(`Mark this incident as ${status}?`)) {
                 await updateDoc(doc(db, "incidents", id), { status: status });
             }
         };
 
         window.deleteIncident = async (id) => {
-            if(confirm("Permanently delete this report?")) {
+            if (confirm("Permanently delete this report?")) {
                 await deleteDoc(doc(db, "incidents", id));
             }
         };

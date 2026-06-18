@@ -6,6 +6,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" type="image/png" href="PAF_Seal.png">
     <title>PAF Manage Artifacts</title>
+    <script>
+        // Session guard — bawal bumalik pag naka-logout na
+        if (localStorage.getItem('paf_admin_session') !== 'active') {
+            window.location.replace("paf-hero.html");
+        }
+    </script>
     <style>
         #profileDropdown.show { display: block !important; }
         .modal { display: none; opacity: 0; }

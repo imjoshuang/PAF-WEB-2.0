@@ -140,10 +140,13 @@
             try {
                 await signInWithEmailAndPassword(auth, email, password);
                 
+                // Set session flag sa localStorage para hindi makabalik after logout
+                localStorage.setItem('paf_admin_session', 'active');
+                
                 showNotification("Login Successful! Welcome, Admin.", true);
                 
                 setTimeout(() => {
-                    window.location.href = "dashboard.html"; 
+                    window.location.replace("dashboard.html");
                 }, 1500);
 
             } catch (error) {
